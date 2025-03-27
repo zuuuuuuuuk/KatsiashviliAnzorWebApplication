@@ -15,6 +15,7 @@ namespace KatsiashviliAnzorWebApplication.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Advertisement> Advertisements { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -52,9 +53,9 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .HasForeignKey(oi => oi.OrderId);
 
             modelBuilder.Entity<Product>()
-                   .HasOne(p => p.Sale)
+                   .HasMany(p => p.Sales)
                    .WithMany(s => s.ProductsOnThisSale)
-                   .HasForeignKey(p => p.SaleId);
+                   .UsingEntity(j => j.ToTable("ProductSales")); // junction table <3
 
             modelBuilder.Entity<Product>()
                    .HasOne(p => p.Category)
@@ -67,11 +68,32 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .HasForeignKey(r => r.ProductId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+           
+
             modelBuilder.Entity<Review>()
                    .HasOne(r => r.User) 
                    .WithMany()  
                    .HasForeignKey(r => r.UserId) 
                    .OnDelete(DeleteBehavior.Cascade);
+
+
+            // decimal precision configurations
+            modelBuilder.Entity<OrderItem>()
+                .Property(oi => oi.Price)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.OriginalPrice)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Sale>()
+                .Property(s => s.DiscountValue)
+                .HasColumnType("decimal(18,2)");
+
+            // Additional precision for TotalAmount in Order
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalAmount)
+                .HasColumnType("decimal(18,2)");
         }
     }
 }

@@ -95,7 +95,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpGet("{id}/orders")]
         public IActionResult GetOrdersByUserId(int id)
         {
-        User user = _userService.GetUserById(id);
+            User user = _userService.GetUserById(id);
             if (user == null)
             {
                 return BadRequest("User with that Id does not exist");
@@ -107,14 +107,14 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             else
             {
                 List<Order> orders = _orderService.GetOrdersByUserId(id);
-                if (orders == null) 
+                if (orders == null)
                 {
                     return BadRequest("orders are null");
                 }
 
                 return Ok(orders);
             }
-            }
+        }
 
         [HttpDelete("{id}")]
 

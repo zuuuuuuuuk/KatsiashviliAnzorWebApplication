@@ -1,6 +1,7 @@
 ﻿using KatsiashviliAnzorWebApplication.Data;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
+using Microsoft.EntityFrameworkCore;
 
 namespace KatsiashviliAnzorWebApplication.Services.Implementation
 {
@@ -34,7 +35,10 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
 
         public Category GetCategoryById(int id)
         {
-            return _context.Categories.FirstOrDefault(c => c.Id == id);
+            return _context.Categories.Include(c => c.Products)
+                .ThenInclude(p => p.Images)
+                .AsSplitQuery()   //this also prevents data duplication as ef defaults to single query behavior in result set
+                .FirstOrDefault(c => c.Id == id); 
         }
 
         public void UpdateCategory(Category category)

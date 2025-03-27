@@ -9,8 +9,8 @@ namespace KatsiashviliAnzorWebApplication.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal OriginalPrice { get; set; }
-        public int? SaleId { get; set; }
-        public Sale? Sale { get; set; } //navigation property
+        
+        public ICollection<Sale>? Sales { get; set; } //navigation property
         public int CategoryId { get; set; }
 
         [JsonIgnore]
@@ -19,6 +19,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         public ICollection<Image>? Images { get; set; }
         public ProductAvailability ProductAvailability { get; set; } // is active - 0(default)   or not - 1
         public DateTime CreatedAt { get; set; }
+        [JsonIgnore]
         public ICollection<Review>? Reviews { get; set; }
         public double? AverageRating { get; set; }
         

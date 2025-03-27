@@ -1,8 +1,9 @@
 ﻿namespace KatsiashviliAnzorWebApplication.Enum
 {
+
     public enum OrderStatus
     {
-        Pending,
+        Pending, 
         Paid,
         Shipped,
         Delivered

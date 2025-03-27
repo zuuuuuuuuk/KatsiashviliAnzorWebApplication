@@ -34,6 +34,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(products);
         }
 
+
         [HttpGet("{id}")]
         public IActionResult GetProduct(int id)
         {
@@ -41,17 +42,26 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(prod);
         }
 
-        [HttpPost]
-        public IActionResult AddProduct(ProductDto product) 
+
+        [HttpGet("category/{categoryId}")]
+        public IActionResult GetProductsByCategoryId(int categoryId)
         {
-           
+            var prods = _productService.GetProductsByCategoryId(categoryId).ToList();
+            return Ok(prods);
+        }
+
+
+        [HttpPost]
+        public IActionResult AddProduct(ProductDto product)
+        {
+
 
             if (product == null)
             {
                 return BadRequest("product is null");
             }
 
-            // Check if the category exists
+            // this checks if the category exists
             var categoryExists = _context.Categories.Any(c => c.Id == product.CategoryId);
             if (!categoryExists)
             {
@@ -62,10 +72,10 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             if (product.Images != null && product.Images.Any())
             {
-               
+
                 foreach (var image in product.Images)
                 {
-                  
+
                     Image img = new Image()
                     {
                         Url = image.Url,
@@ -79,7 +89,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
 
 
-                Product prod = new Product()
+            Product prod = new Product()
             {
                 Name = product.Name,
                 Description = product.Description,
@@ -90,10 +100,44 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 ProductAvailability = ProductAvailability.Active,
                 CreatedAt = DateTime.UtcNow
             };
-            
+
             _productService.AddProduct(prod);
             return Ok(prod);
 
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateProduct(int id, ProductDto product)
+        {
+            var existingProduct = _productService.GetProductById(id);
+
+
+            if (product == null)
+            {
+                return BadRequest("product is null");
+            }
+
+            if (!string.IsNullOrWhiteSpace(product.Name))
+                existingProduct.Name = product.Name;
+            if (!string.IsNullOrWhiteSpace(product.Description))
+                existingProduct.Description = product.Description;
+            if (product.OriginalPrice > 0)
+                existingProduct.OriginalPrice = product.OriginalPrice;
+            if (product.Stock > 0)
+                existingProduct.Stock = product.Stock;
+            if (product.CategoryId > 0)
+                existingProduct.CategoryId = product.CategoryId;
+
+            if (product.Images == null || !product.Images.Any())
+            {
+                return BadRequest("images are null");
+            }
+            if (existingProduct != null)
+                existingProduct.Images = product.Images;
+
+            _productService.UpdateProduct(existingProduct);
+
+            return Ok("product updated successfully");
         }
 
         [HttpDelete("{id}")]

@@ -29,13 +29,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCategoryById(int id) 
+        public IActionResult GetCategoryById(int id)
         {
-          var categ = _categoryService.GetCategoryById(id);
+            var categ = _categoryService.GetCategoryById(id);
             return Ok(categ);
         }
 
-     
+
         [HttpPost]
         public IActionResult AddCategory(CategoryDto category)
         {
@@ -56,7 +56,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(category);
         }
 
-        [HttpPut("{id}")] 
+        [HttpPut("{id}")]
         public IActionResult UpdateCategory(int id, CategoryDto category)
         {
             if (category == null)
@@ -69,7 +69,22 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 return BadRequest($"category with id {id} does not exist");
             }
-            return Ok();
+
+            if (!string.IsNullOrWhiteSpace(category.Name))
+                existingCategory.Name = category.Name;
+
+            if (category.ParentId != 0)
+                existingCategory.ParentId = category.ParentId;
+
+            if (!string.IsNullOrWhiteSpace(category.Description))
+                existingCategory.Description = category.Description;
+
+            if (!string.IsNullOrWhiteSpace(category.Image))
+                existingCategory.Image = category.Image;
+
+            _categoryService.UpdateCategory(existingCategory);
+
+            return Ok($"Category with id {id} has been updated successfully");
         }
 
         [HttpDelete("{id}")]

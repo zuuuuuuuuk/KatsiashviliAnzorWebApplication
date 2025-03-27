@@ -105,57 +105,25 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok($"{user.LastName} has successfully created an order");
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateOrder(int id, OrderDto updatedOrder)
+        [HttpPut("{id}/status")]
+        public IActionResult UpdateOrder(int id, OrderStatus status)
         {
-            
+
             var existingOrder = _orderService.GetOrderById(id);
+
             if (existingOrder == null)
             {
-                return BadRequest("order doesn't exist");
+                return BadRequest("order with that id doesnt exist");
             }
-
-          
-
-            
-            existingOrder.ShippingAddress = updatedOrder.ShippingAddress;
-            existingOrder.PaymentMethod = updatedOrder.PaymentMethod;
-           
-
-
-            existingOrder.OrderItems.Clear();
-
-            decimal totalAmount = 0;
-
-          
-
-            foreach (var orderItem in updatedOrder.OrderItems)
-            {
-                var product = _productService.GetProductById(orderItem.ProductId);
-                if (product == null)
-                {
-                    return BadRequest("product is null");
-                }
-
-                var ordItem = new OrderItem()
-                {
-                    OrderId = existingOrder.Id, 
-                    ProductId = orderItem.ProductId,
-                    Quantity = orderItem.Quantity,
-                    Price = product.OriginalPrice
-                };
-
-                existingOrder.OrderItems.Add(ordItem);
-                totalAmount += ordItem.Quantity * ordItem.Price;
-            }
-
-            existingOrder.TotalAmount = totalAmount;
-
+            existingOrder.Status = status;
             _orderService.UpdateOrder(existingOrder);
 
 
-            return Ok($"Order with id {id} has been updated successfully");
+            return Ok($"Order status with id {id} has been updated successfully");
         }
+
+
+
 
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)

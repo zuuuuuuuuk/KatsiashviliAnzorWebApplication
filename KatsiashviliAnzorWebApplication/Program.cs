@@ -2,7 +2,9 @@ using KatsiashviliAnzorWebApplication.Data;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
 using KatsiashviliAnzorWebApplication.Services.Implementation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,6 +19,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<ISaleService, SaleService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

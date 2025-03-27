@@ -4,6 +4,7 @@ using KatsiashviliAnzorWebApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KatsiashviliAnzorWebApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326153600_reviewpropchange")]
+    partial class reviewpropchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,40 +23,6 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Advertisement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RedirectUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Advertisements");
-                });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Cart", b =>
                 {
@@ -250,12 +218,17 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                     b.Property<int>("ProductAvailability")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SaleId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("SaleId");
 
                     b.ToTable("Products");
                 });
@@ -274,11 +247,8 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
-
-                    b.Property<string>("ReviewText")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -360,21 +330,6 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ProductSale", b =>
-                {
-                    b.Property<int>("ProductsOnThisSaleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SalesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductsOnThisSaleId", "SalesId");
-
-                    b.HasIndex("SalesId");
-
-                    b.ToTable("ProductSales", (string)null);
-                });
-
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Cart", b =>
                 {
                     b.HasOne("KatsiashviliAnzorWebApplication.Models.User", "User")
@@ -442,7 +397,13 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("KatsiashviliAnzorWebApplication.Models.Sale", "Sale")
+                        .WithMany("ProductsOnThisSale")
+                        .HasForeignKey("SaleId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("Sale");
                 });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Review", b =>
@@ -462,21 +423,6 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ProductSale", b =>
-                {
-                    b.HasOne("KatsiashviliAnzorWebApplication.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsOnThisSaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KatsiashviliAnzorWebApplication.Models.Sale", null)
-                        .WithMany()
-                        .HasForeignKey("SalesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Cart", b =>
@@ -499,6 +445,11 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Sale", b =>
+                {
+                    b.Navigation("ProductsOnThisSale");
                 });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.User", b =>

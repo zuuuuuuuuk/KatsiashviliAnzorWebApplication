@@ -37,5 +37,24 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                  .FirstOrDefault(p => p.Id == id);
 
         }
+
+        public List<Product> GetProductsByCategoryId(int id)
+        {
+            {
+                return _context.Categories
+                    .Where(c => c.Id == id)
+                    .Include(c => c.Products)
+                        .ThenInclude(p => p.Images)  
+                    .AsSplitQuery()  // This prevents potential performance issues gets rid of duplicating data 
+                    .SelectMany(c => c.Products)
+                    .ToList();
+            }
+        }
+
+        public void UpdateProduct(Product product)
+        {
+            _context.Products.Update(product);
+            _context.SaveChanges();
+        }
     }
 }
