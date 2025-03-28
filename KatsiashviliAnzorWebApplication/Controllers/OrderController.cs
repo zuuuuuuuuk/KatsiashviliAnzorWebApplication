@@ -54,12 +54,12 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var ord = new Order()
             {
                 UserId = order.UserId,
-                TotalAmount = 0,
+                PromoCode = order.PromoCode,
                 OrderItems = new List<OrderItem>(),
                 ShippingAddress = order.ShippingAddress,
                 PaymentMethod = order.PaymentMethod,
                 CreatedAt = DateTime.UtcNow,
-                Status = OrderStatus.Paid,
+                Status = OrderStatus.Pending,
             };
 
 
@@ -128,6 +128,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)
         {
+           var order = _orderService.GetOrderById(id);
+            if (order == null)
+            {
+                return BadRequest("can not find order with that id");
+            }
             _orderService.DeleteOrder(id);
             return Ok($"Order with id {id} has been deleted successfully");
         }

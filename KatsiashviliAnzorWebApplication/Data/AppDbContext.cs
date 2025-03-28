@@ -14,6 +14,7 @@ namespace KatsiashviliAnzorWebApplication.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbSet<PromoCode> PromoCodes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Advertisement> Advertisements { get; set; }
 
@@ -77,7 +78,26 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .OnDelete(DeleteBehavior.Cascade);
 
 
-            // decimal precision configurations
+
+            // decimal precision configurations 
+
+
+            modelBuilder.Entity<PromoCode>()
+                .Property(p => p.DiscountValue)
+                .HasPrecision(18, 4);
+            base.OnModelCreating(modelBuilder);
+
+
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.DiscountedPrice)
+                .HasPrecision(18, 4);    
+
+            base.OnModelCreating(modelBuilder);
+
+
+
+            
             modelBuilder.Entity<OrderItem>()
                 .Property(oi => oi.Price)
                 .HasColumnType("decimal(18,2)");

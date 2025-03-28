@@ -143,6 +143,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteProduct(int id)
         {
+            var product = _productService.GetProductById(id);
+            if (product == null)
+            {
+                return BadRequest("can not find product with that id");
+            }
             _productService.DeleteProduct(id);
             return Ok($"product with id {id} has been deleted successfully");
         }

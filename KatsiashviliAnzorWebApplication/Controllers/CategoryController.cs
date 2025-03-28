@@ -90,6 +90,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCategory(int id)
         {
+            var category = _categoryService.GetCategoryById(id);
+            if (category == null)
+            {
+                return BadRequest("can not find category with that id");
+            }
             _categoryService.DeleteCategory(id);
             return Ok($"category with id {id} has been deleted");
         }

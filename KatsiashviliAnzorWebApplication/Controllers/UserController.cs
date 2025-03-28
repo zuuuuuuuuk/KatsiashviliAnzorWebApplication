@@ -120,6 +120,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
         public IActionResult DeleteUser(int id)
         {
+            var user = _userService.GetUserById(id);
+            if (user == null)
+            {
+                return BadRequest("can not find user with that id");
+            }
             _userService.DeleteUser(id);
             return Ok("User has been deleted");
         }

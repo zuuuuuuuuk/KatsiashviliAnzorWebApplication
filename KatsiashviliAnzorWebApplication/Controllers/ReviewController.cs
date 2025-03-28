@@ -129,6 +129,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteReview(int id)
         {
+            var review = _reviewService.GetReviewById(id);
+            if (review == null)
+            {
+                return BadRequest("can not find review with that id");
+            }
             _reviewService.DeleteReview(id);
             return Ok($"Review with id {id} has been deleted successfully");
         }

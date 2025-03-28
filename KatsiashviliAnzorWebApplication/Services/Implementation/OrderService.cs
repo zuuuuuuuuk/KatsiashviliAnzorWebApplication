@@ -52,10 +52,9 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
         }
 
         public void DeleteOrder(int id)
-        {
+        { 
             _context.Orders.Remove(GetOrderById(id));
             _context.SaveChanges();
-           
         }
     }
 }

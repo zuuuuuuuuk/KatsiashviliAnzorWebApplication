@@ -13,6 +13,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         public ICollection<OrderItem>? OrderItems { get; set; }
         public OrderStatus Status { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string? PromoCode { get; set; } // for users to apply before creating order - not for relations
         public string ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
         public DateTime CreatedAt { get; set; }

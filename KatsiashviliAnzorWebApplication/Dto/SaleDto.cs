@@ -10,6 +10,6 @@ namespace KatsiashviliAnzorWebApplication.Dto
         public DateTime StartsAt { get; set; }
         public DateTime EndsAt { get; set; }
         public bool IsActive { get; set; }
-        public ICollection<Product> ProductsOnThisSale { get; set; }
+        public List<int> ProductIdsOnThisSale { get; set; }
     }
 }

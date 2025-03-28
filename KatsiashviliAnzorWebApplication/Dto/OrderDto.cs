@@ -16,7 +16,7 @@ namespace KatsiashviliAnzorWebApplication.Dto
         
         public string ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
-
+        public string? PromoCode { get; set; }
         [JsonIgnore]
         public DateTime CreatedAt { get; set; }
     }
