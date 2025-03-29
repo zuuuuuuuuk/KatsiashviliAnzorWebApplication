@@ -94,5 +94,18 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
+        [HttpDelete("id")]
+        public IActionResult DeleteAdvertisement(int id)
+        {
+            var advertisement = _advertisementService.GetAdvertisementById(id);
+            if (advertisement == null)
+            {
+                return BadRequest("cant find advertisement with that ID");
+            }
+            _advertisementService.DeleteAdvertisement(id);
+            return Ok($"advertisement with id {id} has been deleted");
+        }
+
+
     }
 }
