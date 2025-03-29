@@ -96,8 +96,10 @@ namespace KatsiashviliAnzorWebApplication.Data
             base.OnModelCreating(modelBuilder);
 
 
+            modelBuilder.Entity<OrderItem>()
+                .Property(oi => oi.DiscountedPrice)
+                .HasColumnType("decimal(18,2)");
 
-            
             modelBuilder.Entity<OrderItem>()
                 .Property(oi => oi.Price)
                 .HasColumnType("decimal(18,2)");

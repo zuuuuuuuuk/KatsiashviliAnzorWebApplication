@@ -117,9 +117,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("product is null");
             }
 
-            if (!string.IsNullOrWhiteSpace(product.Name))
+            if (!string.IsNullOrWhiteSpace(product.Name) && product.Name != "string")
                 existingProduct.Name = product.Name;
-            if (!string.IsNullOrWhiteSpace(product.Description))
+            if (!string.IsNullOrWhiteSpace(product.Description) && product.Description != "string")
                 existingProduct.Description = product.Description;
             if (product.OriginalPrice > 0)
                 existingProduct.OriginalPrice = product.OriginalPrice;

@@ -115,7 +115,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 return BadRequest("review with that id doesn't exist");
             }
-            if(!string.IsNullOrEmpty(review.ReviewText))
+            if(!string.IsNullOrEmpty(review.ReviewText) && review.ReviewText != "string")
                 existingReview.ReviewText = review.ReviewText;
             if(review.Rating > 0) 
                 existingReview.Rating = review.Rating;

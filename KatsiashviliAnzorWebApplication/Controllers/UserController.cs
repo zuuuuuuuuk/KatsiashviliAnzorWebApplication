@@ -75,16 +75,16 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("user is null");
             }
 
-            if (!string.IsNullOrWhiteSpace(user.FirstName))
+            if (!string.IsNullOrWhiteSpace(user.FirstName) && user.FirstName != "string")
                 us.FirstName = user.FirstName;
 
-            if (!string.IsNullOrWhiteSpace(user.LastName))
+            if (!string.IsNullOrWhiteSpace(user.LastName) && user.LastName != "string")
                 us.LastName = user.LastName;
 
-            if (!string.IsNullOrWhiteSpace(user.Email))
+            if (!string.IsNullOrWhiteSpace(user.Email) && user.Email != "string")
                 us.Email = user.Email;
 
-            if (!string.IsNullOrWhiteSpace(user.Password))
+            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password != "string")
                 us.Password = user.Password;
 
             _userService.UpdateUser(us);

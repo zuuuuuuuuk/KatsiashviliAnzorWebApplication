@@ -13,12 +13,14 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
         private readonly IProductService _productService;
+        private readonly IPromoCodeService _promoCodeService;
 
-        public OrderController(IOrderService orderService, IUserService userService, IProductService productService)
+        public OrderController(IOrderService orderService, IUserService userService, IProductService productService, IPromoCodeService promoCodeService)
         {
             _orderService = orderService;
             _userService = userService;
             _productService = productService;
+            _promoCodeService = promoCodeService;
         }
 
         [HttpGet]
@@ -83,22 +85,39 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                     return BadRequest("product is null");
                 }
 
+                decimal discountedPrice = product.DiscountedPrice;
+
 
                 var orderItem = new OrderItem()
                 {
                     OrderId = ord.Id,
                     ProductId = OrderItem.ProductId,
                     Quantity = OrderItem.Quantity,
-                    Price = product.OriginalPrice
+                    Price = product.OriginalPrice,
+                    DiscountedPrice = discountedPrice                    
                 };
 
 
 
-                totalAmount += orderItem.Quantity * orderItem.Price;
+                totalAmount += orderItem.Quantity * orderItem.DiscountedPrice;
                 ord.OrderItems.Add(orderItem);
             }
 
-            ord.TotalAmount = totalAmount;
+            if (!string.IsNullOrWhiteSpace(order.PromoCode) && order.PromoCode != "string")
+            {
+                var promoCode = _promoCodeService.getPromoCodeByCode(order.PromoCode);
+        if (promoCode == null)
+                {
+                    return BadRequest("existing promocode was not found");
+                }
+                // updates final discountValue for order depending on it's previous sale discounts
+               
+                decimal discountAmount = (promoCode.DiscountValue / 100) * totalAmount; 
+                                                                                      
+                totalAmount -= discountAmount;
+            }
+
+                ord.TotalAmount = totalAmount;
             _orderService.UpdateOrder(ord);
 
 

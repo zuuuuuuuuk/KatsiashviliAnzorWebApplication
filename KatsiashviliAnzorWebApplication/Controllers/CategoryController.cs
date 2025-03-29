@@ -70,16 +70,16 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest($"category with id {id} does not exist");
             }
 
-            if (!string.IsNullOrWhiteSpace(category.Name))
+            if (!string.IsNullOrWhiteSpace(category.Name) && category.Name != "string")
                 existingCategory.Name = category.Name;
 
             if (category.ParentId != 0)
                 existingCategory.ParentId = category.ParentId;
 
-            if (!string.IsNullOrWhiteSpace(category.Description))
+            if (!string.IsNullOrWhiteSpace(category.Description) && category.Description != "string")
                 existingCategory.Description = category.Description;
 
-            if (!string.IsNullOrWhiteSpace(category.Image))
+            if (!string.IsNullOrWhiteSpace(category.Image) && category.Image != "string")
                 existingCategory.Image = category.Image;
 
             _categoryService.UpdateCategory(existingCategory);

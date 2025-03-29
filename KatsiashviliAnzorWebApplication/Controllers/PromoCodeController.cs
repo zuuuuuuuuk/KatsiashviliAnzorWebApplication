@@ -21,7 +21,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         [HttpGet]
         public ActionResult GetAllPromoCodes() 
         {
-            var promoCodes = _promoCodeService.GetPromoCodeList().ToList();
+            var promoCodes = _promoCodeService.GetPromoCodeList();
             return Ok(promoCodes);
         }
 
@@ -46,7 +46,14 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                return BadRequest("promoCode must not be null");
             }
-            _context.Add(promoCodeDto);
+            PromoCode pCode = new PromoCode()
+            {
+              Name = promoCodeDto.Name,
+              Code = promoCodeDto.Code,
+              Description = promoCodeDto.Description,
+              DiscountValue = promoCodeDto.DiscountValue
+            };
+            _promoCodeService.AddPromoCode(pCode);
             return Ok("promoCode added Successfully");
         }
 
@@ -66,11 +73,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
             
 
-            if (!string.IsNullOrWhiteSpace(promoCodeDto.Name))
+            if (!string.IsNullOrWhiteSpace(promoCodeDto.Name) && promoCodeDto.Name != "string")
                 existingPromoCode.Name = promoCodeDto.Name;
-            if (!string.IsNullOrWhiteSpace(promoCodeDto.Description))
+            if (!string.IsNullOrWhiteSpace(promoCodeDto.Description) && promoCodeDto.Description != "string")
                 existingPromoCode.Description = promoCodeDto.Description;
-            if (!string.IsNullOrWhiteSpace(promoCodeDto.Code))
+            if (!string.IsNullOrWhiteSpace(promoCodeDto.Code) && promoCodeDto.Code != "string")
                 existingPromoCode.Code = promoCodeDto.Code;
             if (promoCodeDto.DiscountValue > 0)
             {
