@@ -107,6 +107,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                     }
                     else
                     {
+                        // Multiply the discounts of all active sales for this product
                         decimal discountMultiplier = activeSales
                             .Aggregate(1m, (total, s) => total * (1 - (s.DiscountValue / 100)));
 
@@ -140,12 +141,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
         // Activating Specific Sale with ID
 
-        [HttpPost("{id}/activate")]
-        public IActionResult ActivateSaleById(int id)
+        [HttpPost("{id}/{days}")]
+        public IActionResult ActivateSaleById(int id, int days)
         {
+
             try
             {
-                _saleService.ActivateSale(id);
+                _saleService.ActivateSale(id, days);
                 return Ok($"sale with id {id} is active");
             }
             catch (Exception ex)
@@ -172,15 +174,15 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
         // Activating All the Sales
 
-        [HttpPost("activate-all")]
-        public IActionResult ActivateAllSales()
+        [HttpPost("{days}/activate-all")]
+        public IActionResult ActivateAllSales(int days)
         {
             var sales = _saleService.GetAllSales().ToList();
             try
             {
                 foreach (var sale in sales)
                 {
-                    _saleService.ActivateSale(sale.Id);
+                    _saleService.ActivateSale(sale.Id, days);
                 }
             }
             catch (Exception ex)

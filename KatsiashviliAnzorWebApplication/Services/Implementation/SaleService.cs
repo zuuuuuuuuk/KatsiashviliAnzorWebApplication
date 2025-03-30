@@ -1,4 +1,5 @@
 ﻿using KatsiashviliAnzorWebApplication.Data;
+using KatsiashviliAnzorWebApplication.Dto;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -17,9 +18,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             _productService = productService;
         }
 
-        
-
-
+       
 
 
         public void AddSale(Sale sale)
@@ -39,7 +38,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
 
 
         // Activation of specific sale
-        public void ActivateSale(int saleId)
+        public void ActivateSale(int saleId, int days)
         {
             var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
 
@@ -48,21 +47,46 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 throw new Exception("Sale not found");
             }
 
-            foreach(var product in sale.ProductsOnThisSale)
+            if(sale.StartsAt >=  DateTime.UtcNow)
             {
-                decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
-                product.DiscountedPrice = discountedPrice;
-
-                _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                sale.StartsAt = DateTime.UtcNow;
+            }
+            
+            if (sale.EndsAt <= DateTime.UtcNow)
+            {
+                sale.EndsAt = DateTime.UtcNow.AddDays(days); 
             }
 
-            _context.SaveChanges();
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var product in sale.ProductsOnThisSale)
+                    {
+                        decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
+                        product.DiscountedPrice = discountedPrice;
+
+                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                    }
+                    sale.IsActive = true;
+                    _context.Sales.Update(sale);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("error during sale activation", ex);
+                }
+            }
+
 
         }
 
-        
+
         // Deactivation of specific sale 
-        
+
         public void DeactivateSale(int saleId)
         {
             var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
@@ -71,35 +95,51 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             {
                 throw new Exception("Sale not found");
             }
-
-            foreach (var product in sale.ProductsOnThisSale)
+            
+            
+            using (var transaction = _context.Database.BeginTransaction()) // ert operaciad rom moxdes da naxevrad ar sheicvalos baza
             {
-                // checking if there are other active sales for this product
-                var otherActiveSales = _context.Sales
-                    .Where(s => s.IsActive && s.Id != saleId && s.ProductsOnThisSale.Contains(product))
-                    .ToList();
-
-                if (!otherActiveSales.Any())
+                try
                 {
-                    // if there are no other active sales, reset to originalPrice
-                    product.DiscountedPrice = product.OriginalPrice;
+                    foreach (var product in sale.ProductsOnThisSale)
+                    {
+                        // checking if there are other active sales for this product
+                        var otherActiveSales = _context.Sales
+                            .Where(s => s.IsActive && s.Id != saleId && s.ProductsOnThisSale.Contains(product))
+                            .ToList();
+
+                        if (!otherActiveSales.Any())
+                        {
+                            // if there are no other active sales, reset to originalPrice
+                            product.DiscountedPrice = product.OriginalPrice;
+                        }
+                        else
+                        {
+                            // applying remaining active sales
+                            decimal discountMultiplier = otherActiveSales
+                                .Aggregate(1m, (total, s) => total * (1 - (s.DiscountValue / 100)));
+
+                            product.DiscountedPrice = product.OriginalPrice * discountMultiplier;
+                            
+                        }
+
+                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                    }
+
+                    sale.IsActive = false;
+                    _context.Update(sale);
+                    _context.SaveChanges();
+                    transaction.Commit();
                 }
-                else
+                catch (Exception ex)
                 {
-                    // applying remaining active sales
-                    decimal discountMultiplier = otherActiveSales
-                        .Aggregate(1m, (total, s) => total * (1 - (s.DiscountValue / 100)));
-
-                    product.DiscountedPrice = product.OriginalPrice * discountMultiplier;
+                    transaction.Rollback();
+                    throw new Exception("error during sale deactivation", ex);
                 }
+            } 
 
-                _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
-            }
-
-            _context.SaveChanges();
+           
         }
-
-
 
 
        
@@ -130,6 +170,50 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             _context.Sales.Update(sale);
         }
 
-       
+        public void ActivateSaleWithDefaultDates(int saleId) // for background service use
+        {
+            var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
+
+            if (sale == null)
+            {
+                throw new Exception("Sale not found");
+            }
+
+            if (sale.StartsAt >= DateTime.UtcNow && sale.EndsAt > DateTime.UtcNow)
+            {
+                sale.StartsAt = DateTime.UtcNow;
+            }else
+            {
+                throw new Exception("dates are incorrect");
+            }
+
+            
+
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var product in sale.ProductsOnThisSale)
+                    {
+                        decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
+                        product.DiscountedPrice = discountedPrice;
+
+                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                    }
+                    sale.IsActive = true;
+                    _context.Sales.Update(sale);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("error during sale activation", ex);
+                }
+            }
+
+
+        }
     }
 }

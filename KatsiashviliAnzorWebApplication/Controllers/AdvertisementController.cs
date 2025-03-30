@@ -47,9 +47,6 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 Title = advertisementDto.Title,
                 ImageUrl = advertisementDto.ImageUrl,
                 RedirectUrl = advertisementDto.RedirectUrl,
-                StartDate = advertisementDto.StartDate ?? DateTime.UtcNow,
-                EndDate = advertisementDto.EndDate ?? DateTime.UtcNow.AddDays(1),
-                IsActive = advertisementDto.IsActive,
             };
             _advertisementService.CreateAdvertisement(adToAdd);
             return Ok("Advertisement created successfully");
@@ -73,20 +70,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if(!string.IsNullOrEmpty(advertisementDto.RedirectUrl) && advertisementDto.RedirectUrl != "string")
                 adToChange.RedirectUrl = advertisementDto.RedirectUrl;
          
-            if (advertisementDto.StartDate.HasValue)
-                adToChange.StartDate = advertisementDto.StartDate.Value;
-      
-            if (advertisementDto.EndDate.HasValue)
-            {
-                if (advertisementDto.EndDate.Value < adToChange.StartDate)
-                    {
-                        return BadRequest("End date cannot be before the start date");
-                    }
-
-                adToChange.EndDate = advertisementDto.EndDate.Value;
-            }
-
-            adToChange.IsActive = advertisementDto.IsActive;
+         
 
             _advertisementService.UpdateAdvertisement(adToChange);
 

@@ -10,7 +10,8 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
         List<Sale> GetAllSales();
         Sale GetSaleById(int id);
         List<Sale> GetSalesByProductId(int productId);
-        void ActivateSale(int saleId);
+        void ActivateSale(int saleId, int days);
+        void ActivateSaleWithDefaultDates(int saleId); // for background service use
         void DeactivateSale(int saleId);
 
     }
