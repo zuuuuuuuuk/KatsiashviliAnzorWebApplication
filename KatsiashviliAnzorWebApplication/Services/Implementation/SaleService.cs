@@ -47,27 +47,33 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 throw new Exception("Sale not found");
             }
 
-            if(sale.StartsAt >=  DateTime.UtcNow)
+            if (!sale.StartsAt.HasValue && !sale.EndsAt.HasValue) // checking if sale got no dates yet
+            {
+                sale.StartsAt = DateTime.UtcNow;
+                sale.EndsAt = DateTime.UtcNow.AddDays(days);
+            }
+
+            if(sale.StartsAt <=  DateTime.UtcNow)
             {
                 sale.StartsAt = DateTime.UtcNow;
             }
-            
-            if (sale.EndsAt <= DateTime.UtcNow)
-            {
-                sale.EndsAt = DateTime.UtcNow.AddDays(days); 
-            }
+
+            sale.EndsAt = DateTime.UtcNow.AddDays(days);
 
 
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    foreach (var product in sale.ProductsOnThisSale)
+                    if (sale.ProductsOnThisSale != null)
                     {
-                        decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
-                        product.DiscountedPrice = discountedPrice;
+                        foreach (var product in sale.ProductsOnThisSale)
+                        {
+                            decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
+                            product.DiscountedPrice = discountedPrice;
 
-                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                            _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                        }
                     }
                     sale.IsActive = true;
                     _context.Sales.Update(sale);
@@ -123,7 +129,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                             
                         }
 
-                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                        _context.Products.Update(product);
                     }
 
                     sale.IsActive = false;
@@ -141,8 +147,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
            
         }
 
-
-       
+        // Getting All Sales
 
         public List<Sale> GetAllSales()
         {
@@ -151,6 +156,8 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                     .AsSplitQuery()
                     .ToList();
         }
+
+        // Get sale by id
 
         public Sale GetSaleById(int id)
         {
@@ -164,11 +171,16 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
            .Where(s => s.ProductsOnThisSale.Any(p => p.Id == productId))
            .ToList();
         }
+        
+        // Update sale
 
         public void UpdateSale(Sale sale)
         {
             _context.Sales.Update(sale);
+            _context.SaveChanges();
         }
+
+        // Sale activation for background process of checking sale dates automatically
 
         public void ActivateSaleWithDefaultDates(int saleId) // for background service use
         {
@@ -179,41 +191,58 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 throw new Exception("Sale not found");
             }
 
-            if (sale.StartsAt >= DateTime.UtcNow && sale.EndsAt > DateTime.UtcNow)
-            {
-                sale.StartsAt = DateTime.UtcNow;
-            }else
-            {
-                throw new Exception("dates are incorrect");
-            }
 
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        if (sale.ProductsOnThisSale != null)
+                        {
+                            foreach (var product in sale.ProductsOnThisSale)
+                            {
+                                decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
+                                product.DiscountedPrice = discountedPrice;
+
+                                _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                            }
+                        }
+                        sale.IsActive = true;
+                        UpdateSale(sale);
+                        _context.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw new Exception("error during sale activation", ex);
+                    }
+                }
             
 
+        }
 
-            using (var transaction = _context.Database.BeginTransaction())
+        public void UpdateProductDiscountedPrice(Product product)
+        {
+            var activeSales = GetSalesByProductId(product.Id)
+                                          .Where(s => s.IsActive)
+                                          .ToList();
+
+            var prod = product;
+            if (prod != null) 
+            if (!activeSales.Any())
             {
-                try
-                {
-                    foreach (var product in sale.ProductsOnThisSale)
-                    {
-                        decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
-                        product.DiscountedPrice = discountedPrice;
+                prod.DiscountedPrice = prod.OriginalPrice;
+            }
+            else
+            {
+                decimal discountMultiplier = activeSales
+                    .Aggregate(1m, (total, s) => total * (1 - (s.DiscountValue / 100)));
 
-                        _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
-                    }
-                    sale.IsActive = true;
-                    _context.Sales.Update(sale);
-                    _context.SaveChanges();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    throw new Exception("error during sale activation", ex);
-                }
+                prod.DiscountedPrice = prod.OriginalPrice * discountMultiplier;
             }
 
-
+            _context.Products.Update(prod);
+            _context.SaveChanges();
         }
     }
 }

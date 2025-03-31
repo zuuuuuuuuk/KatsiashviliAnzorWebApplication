@@ -2,7 +2,7 @@
 {
     public enum ProductAvailability
     {
-        Active,
-        Inactive
+        Inactive,
+        Active
     }
 }

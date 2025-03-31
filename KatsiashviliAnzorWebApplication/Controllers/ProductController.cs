@@ -102,7 +102,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             };
 
             _productService.AddProduct(prod);
-            return Ok(prod);
+            return Ok("product was added successfully");
 
         }
 

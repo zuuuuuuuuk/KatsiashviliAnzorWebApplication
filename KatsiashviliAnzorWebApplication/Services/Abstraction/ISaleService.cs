@@ -13,6 +13,6 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
         void ActivateSale(int saleId, int days);
         void ActivateSaleWithDefaultDates(int saleId); // for background service use
         void DeactivateSale(int saleId);
-
+        void UpdateProductDiscountedPrice(Product product);
     }
 }

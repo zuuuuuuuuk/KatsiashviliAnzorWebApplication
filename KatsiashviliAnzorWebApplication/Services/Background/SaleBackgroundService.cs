@@ -30,9 +30,12 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                     using (var scope = _serviceScopeFactory.CreateScope())
                     {
                         var saleService = scope.ServiceProvider.GetRequiredService<ISaleService>();
-                        var sales = saleService.GetAllSales();
 
-                     /*   foreach (var sale in sales)
+                        var sales = saleService.GetAllSales()
+                            .Where(s => s.StartsAt.HasValue && s.EndsAt.HasValue)
+                            .ToList();
+
+                        foreach (var sale in sales)
                         {
                             // Check if the sale is active and should be deactivated
                             if (sale.IsActive && sale.EndsAt < DateTime.UtcNow)
@@ -42,22 +45,22 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                                 _logger.LogInformation($"Deactivated sale with ID {sale.Id}");
                             }
                             // Check if the sale should be activated
-                            else if (!sale.IsActive && sale.StartsAt <= DateTime.UtcNow && sale.EndsAt >= DateTime.UtcNow)
+                           if (!sale.IsActive && sale.StartsAt <= DateTime.UtcNow)
                             {
                                 // Activate sale if it should start
                                 saleService.ActivateSaleWithDefaultDates(sale.Id);
                                 _logger.LogInformation($"Activated sale with ID {sale.Id}");
                             }
-                        }*/
+                        }
                     }
-
-                    // Wait 1 minute before running again
-                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                    
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError($"Error in background service of Ssale: {ex.Message}");
                 }
+                // Wait 1 minute before running again
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
     }
