@@ -42,9 +42,9 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
         {
             var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
 
-            if (sale == null)
+            if (sale == null && !sale.IsActive)
             {
-                throw new Exception("Sale not found");
+                throw new Exception("Sale not found or is already active");
             }
 
             if (!sale.StartsAt.HasValue && !sale.EndsAt.HasValue) // checking if sale got no dates yet
@@ -52,13 +52,15 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 sale.StartsAt = DateTime.UtcNow;
                 sale.EndsAt = DateTime.UtcNow.AddDays(days);
             }
-            else if(sale.StartsAt >=  DateTime.UtcNow)   // for checking...
+            else // for checking...
             {
                 sale.StartsAt = DateTime.UtcNow;
-                sale.EndsAt = DateTime.UtcNow.AddDays(days);
-            }
 
-            
+                if (sale.EndsAt <= DateTime.UtcNow)
+                {
+                    sale.EndsAt = DateTime.UtcNow.AddDays(days);
+                }
+            }
 
 
             using (var transaction = _context.Database.BeginTransaction())

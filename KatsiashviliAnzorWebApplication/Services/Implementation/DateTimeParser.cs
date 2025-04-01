@@ -8,25 +8,25 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
     {
 
 
-        public DateTimeParser() { }
+
 
         public DateTime? Parse(string? dateTimeString)
         {
             if (string.IsNullOrWhiteSpace(dateTimeString))
             {
-                throw new ArgumentException("Date string cannot be empty.");
+                return null;
             }
 
-            DateTime parsedDate;
             string[] formats = { "yyyy-MM-dd HH:mm", "yyyy-MM-ddTHH:mm", "yyyy-MM-ddTHH:mm:ss", "MM/dd/yyyy HH:mm" };
 
-            if (DateTime.TryParseExact(dateTimeString, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out parsedDate))
+            if (DateTime.TryParseExact(dateTimeString, formats, CultureInfo.InvariantCulture,
+                                      DateTimeStyles.None, out DateTime parsedDate))
             {
-                return DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                // Assume the input is in local time and convert to UTC for storage
+                return DateTime.SpecifyKind(parsedDate, DateTimeKind.Local).ToUniversalTime();
             }
 
-            throw new Exception("invalid date format. use YYYY-MM-DD HH-mm.");
-
+            throw new Exception("Invalid date format. Use YYYY-MM-DD HH:mm.");
         }
     }
 }
