@@ -52,13 +52,13 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 sale.StartsAt = DateTime.UtcNow;
                 sale.EndsAt = DateTime.UtcNow.AddDays(days);
             }
-
-            if(sale.StartsAt <=  DateTime.UtcNow)
+            else if(sale.StartsAt >=  DateTime.UtcNow)   // for checking...
             {
                 sale.StartsAt = DateTime.UtcNow;
+                sale.EndsAt = DateTime.UtcNow.AddDays(days);
             }
 
-            sale.EndsAt = DateTime.UtcNow.AddDays(days);
+            
 
 
             using (var transaction = _context.Database.BeginTransaction())
@@ -101,7 +101,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             {
                 throw new Exception("Sale not found");
             }
-            
+            var prods = new List<Product>();
             
             using (var transaction = _context.Database.BeginTransaction()) // ert operaciad rom moxdes da naxevrad ar sheicvalos baza
             {
@@ -128,10 +128,11 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                             product.DiscountedPrice = product.OriginalPrice * discountMultiplier;
                             
                         }
-
+                        prods.Add(product);
                         _context.Products.Update(product);
+                        
                     }
-
+                    sale.ProductsOnThisSale = prods;
                     sale.IsActive = false;
                     _context.Update(sale);
                     _context.SaveChanges();
@@ -191,22 +192,21 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 throw new Exception("Sale not found");
             }
 
-
-                using (var transaction = _context.Database.BeginTransaction())
+            sale.IsActive = true;
+            using (var transaction = _context.Database.BeginTransaction())
                 {
                     try
                     {
                         if (sale.ProductsOnThisSale != null)
                         {
-                            foreach (var product in sale.ProductsOnThisSale)
-                            {
-                                decimal discountedPrice = product.OriginalPrice - (product.OriginalPrice * (sale.DiscountValue / 100));
-                                product.DiscountedPrice = discountedPrice;
+                      
 
-                                _context.Entry(product).Property(p => p.DiscountedPrice).IsModified = true;
+                        foreach (var product in sale.ProductsOnThisSale)
+                            {
+                            UpdateProductDiscountedPrice(product);
                             }
                         }
-                        sale.IsActive = true;
+                       
                         UpdateSale(sale);
                         _context.SaveChanges();
                         transaction.Commit();

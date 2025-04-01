@@ -14,11 +14,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         private readonly ISaleService _saleService;
         private readonly IProductService _productService;
         private readonly AppDbContext _context;
-        public SaleController(ISaleService saleService, IProductService productService, AppDbContext context)
+        private readonly IDateTimeParser _dateTimeParser;
+        public SaleController(ISaleService saleService, IProductService productService, AppDbContext context, IDateTimeParser dateTimeParser)
         {
             _saleService = saleService;
             _productService = productService;
             _context = context;
+            _dateTimeParser = dateTimeParser;
 
         }
 
@@ -47,57 +49,98 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("Discount value must be between 0 and 100 (0% to 100%)");
             }
 
-
-            if (saleDto.StartsAt >= saleDto.EndsAt)
+            if(saleDto.StartsAt == null &&  saleDto.EndsAt == null && saleDto.IsActive == true)
             {
-                return BadRequest("Sale start date must be before end date");
+                return BadRequest("sale can not be active without dates");
             }
 
-            
-
-            Sale sale = new Sale()
+            if (saleDto.StartsAt == null && saleDto.EndsAt == null) // adding without dates first option
             {
-                Name = saleDto.Name,
-                DiscountValue = saleDto.DiscountValue,
-                Description = saleDto.Description,
-                StartsAt = saleDto.StartsAt,
-                EndsAt = saleDto.EndsAt,
-                IsActive = saleDto.IsActive,
-                ProductsOnThisSale = new List<Product>()
-            };
 
-            if (saleDto.ProductIdsOnThisSale != null)
-            {
-                foreach (var productId in saleDto.ProductIdsOnThisSale)
+                Sale sale = new Sale()
                 {
-                    var product = _productService.GetProductById(productId);
-                    if (product != null)
+                    Name = saleDto.Name,
+                    DiscountValue = saleDto.DiscountValue,
+                    Description = saleDto.Description,
+                    StartsAt = null,
+                    EndsAt = null,
+                    IsActive = saleDto.IsActive,
+                    ProductsOnThisSale = new List<Product>()
+                };
+
+                if (saleDto.ProductIdsOnThisSale != null)
+                {
+                    foreach (var productId in saleDto.ProductIdsOnThisSale)
                     {
-                        sale.ProductsOnThisSale.Add(product);
+                        var product = _productService.GetProductById(productId);
+                        if (product != null)
+                        {
+                            sale.ProductsOnThisSale.Add(product);
+                        }
+
                     }
-                    
-                }
-           
-            }
 
-            if (sale.IsActive)
+                }
+                _saleService.AddSale(sale);
+
+
+                return Ok(sale);
+            }
+            else
             {
-                if (sale.StartsAt.HasValue && sale.EndsAt.HasValue)
+                var parsedStartsAt = _dateTimeParser.Parse(saleDto.StartsAt);
+                var parsedEndsAt = _dateTimeParser.Parse(saleDto.EndsAt);
+
+                if (parsedStartsAt.HasValue && parsedEndsAt.HasValue && parsedStartsAt >= parsedEndsAt)
                 {
-                    _saleService.ActivateSaleWithDefaultDates(sale.Id);
+                    return BadRequest("Sale start date must be before end date");
                 }
-                else
+
+
+
+                Sale sale = new Sale()
                 {
-                    return BadRequest("sale can not be added in active form without dates");
+                    Name = saleDto.Name,
+                    DiscountValue = saleDto.DiscountValue,
+                    Description = saleDto.Description,
+                    StartsAt = parsedStartsAt,
+                    EndsAt = parsedEndsAt,
+                    IsActive = saleDto.IsActive,
+                    ProductsOnThisSale = new List<Product>()
+                };
+
+                if (saleDto.ProductIdsOnThisSale != null)
+                {
+                    foreach (var productId in saleDto.ProductIdsOnThisSale)
+                    {
+                        var product = _productService.GetProductById(productId);
+                        if (product != null)
+                        {
+                            sale.ProductsOnThisSale.Add(product);
+                        }
+
+                    }
+
                 }
+                _saleService.AddSale(sale);
+
+
+
+                if (sale.IsActive)
+                {
+                    if (sale.StartsAt.HasValue && sale.EndsAt.HasValue)
+                    {
+                        _saleService.ActivateSaleWithDefaultDates(sale.Id);
+                    }
+                    else
+                    {
+                        return BadRequest("sale can not be added in active form without dates");
+                    }
+                }
+
+
+                return Ok(sale);
             }
-
-
-            _saleService.AddSale(sale);
-
-
-            return Ok(sale);
-                    
         }
 
 
@@ -124,10 +167,19 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 existingSale.DiscountValue = sale.DiscountValue;
             if (!string.IsNullOrEmpty(sale.Description) && sale.Description != "string")
                 existingSale.Description = sale.Description;
-            if (sale.StartsAt.HasValue) 
-                existingSale.StartsAt = sale.StartsAt.Value;
-            if (sale.EndsAt.HasValue)
-                existingSale.EndsAt = sale.EndsAt.Value;
+
+            if (!string.IsNullOrEmpty(sale.StartsAt) && sale.StartsAt != "string")
+            {
+                var parsedStartsAt = _dateTimeParser.Parse(sale.StartsAt);
+                existingSale.StartsAt = parsedStartsAt.Value;
+            }
+            if (!string.IsNullOrEmpty(sale.EndsAt) && sale.EndsAt != "string")
+            {
+                var parsedEndsAt = _dateTimeParser.Parse(sale.EndsAt);
+                existingSale.EndsAt = parsedEndsAt.Value;
+            }
+           
+            
 
             existingSale.IsActive = sale.IsActive;
 
@@ -143,16 +195,18 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 if (products != null)
                 
                     foreach (var product in products)
-                {
+                    {
                         existingSale.ProductsOnThisSale.Add(product);
                         
                     }
-                _saleService.ActivateSaleWithDefaultDates(existingSale.Id);
-                _saleService.UpdateSale(existingSale);
-                
+
             }
 
-           
+            _saleService.UpdateSale(existingSale);
+            if (existingSale.IsActive)
+            {
+                _saleService.ActivateSaleWithDefaultDates(existingSale.Id);
+            }
             return Ok($"sale with id {id} has been updated successfully"); 
         }
 

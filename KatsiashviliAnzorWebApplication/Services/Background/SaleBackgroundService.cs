@@ -1,4 +1,5 @@
 ﻿using KatsiashviliAnzorWebApplication.Services.Abstraction;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,6 +18,8 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
+
+            _logger.LogInformation("SaleBackgroundService instance created.");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,22 +38,28 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                             .Where(s => s.StartsAt.HasValue && s.EndsAt.HasValue)
                             .ToList();
 
+
+                        _logger.LogInformation($"Found {sales.Count} sales to process.");
+
+
                         foreach (var sale in sales)
                         {
                             // Check if the sale is active and should be deactivated
+                            _logger.LogInformation($"Processing sale ID {sale.Id}: IsActive={sale.IsActive}, StartsAt={sale.StartsAt}, EndsAt={sale.EndsAt}, Now={DateTime.UtcNow}");
+
                             if (sale.IsActive && sale.EndsAt < DateTime.UtcNow)
                             {
-                                // Deactivate sale if it has ended
                                 saleService.DeactivateSale(sale.Id);
                                 _logger.LogInformation($"Deactivated sale with ID {sale.Id}");
                             }
-                            // Check if the sale should be activated
-                           if (!sale.IsActive && sale.StartsAt <= DateTime.UtcNow)
+                            else if (!sale.IsActive && sale.StartsAt <= DateTime.UtcNow && sale.EndsAt >= DateTime.UtcNow)
                             {
-                                // Activate sale if it should start
                                 saleService.ActivateSaleWithDefaultDates(sale.Id);
                                 _logger.LogInformation($"Activated sale with ID {sale.Id}");
                             }
+                            else
+                            {
+                                _logger.LogInformation("nothing happenedddddddddddddddddddddddddddddddddddddddddddddddddddddddd");                          }
                         }
                     }
                     
