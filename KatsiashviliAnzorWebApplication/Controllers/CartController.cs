@@ -84,5 +84,44 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok("cart created successfully");
         }
 
+        [HttpPut("{id}")]
+        public IActionResult UpdateCart(int id, CartDto cart)
+        {
+            if (cart == null)
+            {
+                return BadRequest("cart is null");
+            }
+
+            var existingCart = _cartService.GetCartById(id);
+            if (existingCart == null)
+            {
+                return BadRequest("cart with that id was not found");
+            }
+
+            if(cart.UserId > 0 && cart.UserId != null)
+            {
+                existingCart.UserId = cart.UserId;
+            }
+            if (cart.CartItems != null && cart.CartItems.Any())
+            {
+                existingCart.CartItems = cart.CartItems.ToList();
+            }
+
+            _cartService.UpdateCart(existingCart);
+            return Ok("cart updated successfully");
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCart(int id)
+        {
+            var cart = _cartService.GetCartById(id);
+            if (cart == null)
+            {
+                return BadRequest($"cart with id {id} was not found");
+            }
+            _cartService.DeleteCart(id);
+            return Ok($"cart with id {id} was deleted successfully");
+        }
+
     }
 }
