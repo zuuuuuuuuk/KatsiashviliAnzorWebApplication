@@ -40,7 +40,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var order = _orderService.GetOrderById(id);
             return Ok(order);
         }
-        // promo wont workkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
+        
+
         [HttpPost]
         public IActionResult AddOrder(OrderDto order)
         {
@@ -62,6 +63,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 PaymentMethod = order.PaymentMethod,
                 CreatedAt = DateTime.UtcNow,
                 Status = OrderStatus.Pending,
+                TotalAmount = 0
             };
 
 
@@ -97,9 +99,15 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                     DiscountedPrice = discountedPrice                    
                 };
 
+                if (discountedPrice > 0)
+                {
+                    totalAmount += orderItem.Quantity * orderItem.DiscountedPrice;
+                } else
+                {
+                    totalAmount += product.OriginalPrice * OrderItem.Quantity;
+                }
 
-
-                totalAmount += orderItem.Quantity * orderItem.DiscountedPrice;
+                
                 ord.OrderItems.Add(orderItem);
             }
 
@@ -115,6 +123,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 decimal discountAmount = (promoCode.DiscountValue / 100) * totalAmount; 
                                                                                       
                 totalAmount -= discountAmount;
+            } else
+            {
+                ord.PromoCode = null;
             }
 
                 ord.TotalAmount = totalAmount;

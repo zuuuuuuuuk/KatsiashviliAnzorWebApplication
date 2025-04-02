@@ -13,10 +13,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 builder.Services.AddHostedService<SaleBackgroundService>();
+builder.Services.AddScoped<IDateTimeParser, DateTimeParser>();
+
 builder.Services.AddScoped<ISaleService, SaleService>();
-
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -27,7 +29,7 @@ builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAdvertisementService, AdvertisementService>();
-builder.Services.AddScoped<IDateTimeParser, DateTimeParser>();
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

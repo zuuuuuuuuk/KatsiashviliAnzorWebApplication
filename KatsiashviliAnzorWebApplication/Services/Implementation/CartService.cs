@@ -35,6 +35,36 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
            return _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.Id == id);
         }
 
+        public Cart GetCartByUserId(int userId)
+        {
+            return _context.Carts.FirstOrDefault(c => c.UserId == userId);
+        }
+
+        public void RemoveExpiredCarts()
+        {
+            var expiredCarts = _context.Carts
+       .Where(c => c.ExpiresAt < DateTime.UtcNow)
+       .ToList();
+
+            foreach (var cart in expiredCarts)
+            {
+                // Restore stock for each item before deleting the cart
+                foreach (var item in cart.CartItems)
+                {
+                    var product = _context.Products.FirstOrDefault(p => p.Id == item.ProductId);
+                    if (product != null)
+                    {
+                        product.Stock += item.Quantity; // Restock products
+                        _context.Products.Update(product);
+                    }
+                }
+
+                _context.Carts.Remove(cart);
+            }
+
+            _context.SaveChanges();
+        }
+
         public void UpdateCart(Cart cart)
         {
             _context.Carts.Update(cart);

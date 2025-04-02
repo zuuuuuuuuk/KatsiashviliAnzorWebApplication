@@ -9,6 +9,8 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
         void UpdateCart(Cart cart);
         List<Cart> GetAllCarts();
         Cart GetCartById(int id);
+        Cart GetCartByUserId(int userId);
+        void RemoveExpiredCarts();
 
     }
 }
