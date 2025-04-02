@@ -16,6 +16,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         public string? PromoCode { get; set; } // for users to apply before creating order - not for relations
         public string ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
+        public string? PaymentInfo { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

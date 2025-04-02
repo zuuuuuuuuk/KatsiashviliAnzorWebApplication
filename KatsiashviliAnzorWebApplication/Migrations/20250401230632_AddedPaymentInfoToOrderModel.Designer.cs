@@ -4,6 +4,7 @@ using KatsiashviliAnzorWebApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KatsiashviliAnzorWebApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250401230632_AddedPaymentInfoToOrderModel")]
+    partial class AddedPaymentInfoToOrderModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,6 +92,8 @@ namespace KatsiashviliAnzorWebApplication.Migrations
 
                     b.HasIndex("CartId");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("CartItems");
                 });
 
@@ -158,6 +162,7 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentInfo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentMethod")
@@ -425,7 +430,15 @@ namespace KatsiashviliAnzorWebApplication.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("KatsiashviliAnzorWebApplication.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Cart");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Image", b =>

@@ -38,10 +38,7 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .WithMany(c => c.CartItems)
                    .HasForeignKey(ci => ci.CartId);
 
-            modelBuilder.Entity<CartItem>()
-                   .HasOne(ci => ci.Product)
-                   .WithMany()
-                   .HasForeignKey(ci => ci.ProductId);
+
 
             modelBuilder.Entity<Order>()
                    .HasOne(o => o.User)
