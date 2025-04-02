@@ -1,6 +1,7 @@
 using KatsiashviliAnzorWebApplication.Data;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
+using KatsiashviliAnzorWebApplication.Services.Background;
 using KatsiashviliAnzorWebApplication.Services.Implementation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddHostedService<SaleBackgroundService>();
+builder.Services.AddHostedService<CartCleanupService>();
 builder.Services.AddScoped<IDateTimeParser, DateTimeParser>();
 
 builder.Services.AddScoped<ISaleService, SaleService>();

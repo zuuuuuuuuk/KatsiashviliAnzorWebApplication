@@ -23,7 +23,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Background
                     cartService.RemoveExpiredCarts();    // mtavari method
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(21), stoppingToken); // Run every 21 minutes
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); // Run every 5 minutes
             }
         }
     }
