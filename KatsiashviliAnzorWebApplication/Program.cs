@@ -3,8 +3,11 @@ using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
 using KatsiashviliAnzorWebApplication.Services.Background;
 using KatsiashviliAnzorWebApplication.Services.Implementation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<SaleBackgroundService>();
 builder.Services.AddHostedService<CartCleanupService>();
 builder.Services.AddScoped<IDateTimeParser, DateTimeParser>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -38,6 +42,30 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                builder.Configuration["Jwt:Key"])),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+// For user auth
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+});
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -48,6 +76,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

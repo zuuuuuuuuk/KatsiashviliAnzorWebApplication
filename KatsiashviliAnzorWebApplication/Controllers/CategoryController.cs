@@ -16,6 +16,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _categoryService = categoryService;
         }
 
+        // Getting all categories
 
         [HttpGet]
         public IActionResult GetAllCategories()
@@ -28,6 +29,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(categories);
         }
 
+        // Get specific category with ID
+
         [HttpGet("{id}")]
         public IActionResult GetCategoryById(int id)
         {
@@ -35,6 +38,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(categ);
         }
 
+        // Create new category 
 
         [HttpPost]
         public IActionResult AddCategory(CategoryDto category)
@@ -55,6 +59,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _categoryService.AddCategory(categ);
             return Ok(category);
         }
+
+        // Update category
 
         [HttpPut("{id}")]
         public IActionResult UpdateCategory(int id, CategoryDto category)
@@ -86,6 +92,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             return Ok($"Category with id {id} has been updated successfully");
         }
+
+        // Delete category
 
         [HttpDelete("{id}")]
         public IActionResult DeleteCategory(int id)

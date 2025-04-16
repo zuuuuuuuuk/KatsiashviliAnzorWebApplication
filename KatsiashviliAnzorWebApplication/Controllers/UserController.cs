@@ -54,7 +54,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Password = user.Password,
+                PasswordHash = user.PasswordHash,
                 CreatedAt = DateTime.UtcNow,
                 Role = UserRole.User,
             };
@@ -84,8 +84,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if (!string.IsNullOrWhiteSpace(user.Email) && user.Email != "string")
                 us.Email = user.Email;
 
-            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password != "string")
-                us.Password = user.Password;
+
+            if (!string.IsNullOrWhiteSpace(user.PasswordHash) && user.PasswordHash != "string")
+                us.PasswordHash = user.PasswordHash;
 
             _userService.UpdateUser(us);
 

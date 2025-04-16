@@ -23,6 +23,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _promoCodeService = promoCodeService;
         }
 
+        // Get all orders
+
         [HttpGet]
         public IActionResult GetAllOrders()
         {
@@ -34,6 +36,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(orders);
         }
 
+        // Get specific order
+
         [HttpGet("{id}")]
         public IActionResult GetOrderById(int id)
         {
@@ -41,6 +45,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(order);
         }
         
+        // Create new order
 
         [HttpPost]
         public IActionResult AddOrder(OrderDto order)

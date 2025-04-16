@@ -25,6 +25,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _orderService = orderService;
         }
 
+        // Get all carts
 
         [HttpGet]
         public IActionResult GetAllCarts() 
@@ -44,6 +45,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(cart);
         }
 
+        // Create new cart
 
         [HttpPost("create")]
         public IActionResult CreateNewCart(CartDto cartDto)
@@ -61,7 +63,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var existingCart = _cartService.GetCartByUserId(cartDto.UserId);
             if (existingCart != null)
             {
-                return BadRequest("User with id {cartDto.UserId} already has an active cart");
+                return BadRequest($"User with id {cartDto.UserId} already has an active cart");
             }
 
 
@@ -99,6 +101,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             return Ok("cart created successfully");
         }
+
+        // Update cart
 
         [HttpPut("{id}")]
         public IActionResult UpdateCart(int id, CartDto cartDto)
@@ -162,7 +166,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 }
             }
 
-            // Update Cart
+            // Updates Cart
             _cartService.UpdateCart(existingCart);
 
             return Ok("Cart updated successfully.");
@@ -276,6 +280,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         // Unnecessary in many cases
+
         [HttpDelete("{id}")]
         public IActionResult DeleteCart(int id)
         {

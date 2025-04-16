@@ -27,7 +27,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
 
 
             //
-            //Band Approval Here   
+            //Bank Approval Here   
             //
 
 
