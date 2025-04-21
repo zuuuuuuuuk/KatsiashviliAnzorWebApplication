@@ -22,11 +22,25 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         public IActionResult GetAllCategories()
         {
             var categories = _categoryService.GetAllCategories();
+            
             if (categories == null)
             {
                 return BadRequest("Categories are null");
             }
-            return Ok(categories);
+            var categorySendDtos = categories.Select(c => new CategorySendDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                ParentId = c.ParentId,
+                Description = c.Description,
+                Image = c.Image,
+                Subcategories = categories
+        .Where(sub => sub.ParentId == c.Id)
+        .Select(sub => sub.Id)
+        .ToList()
+            }).ToList();
+
+            return Ok(categorySendDtos);
         }
 
         // Get specific category with ID
@@ -53,7 +67,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 Name = category.Name,
                 ParentId = category.ParentId,
                 Description = category.Description,
-                Image = category.Image
+                Image = category.Image,
+                
             };
 
             _categoryService.AddCategory(categ);

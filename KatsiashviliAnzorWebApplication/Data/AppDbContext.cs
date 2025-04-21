@@ -38,6 +38,11 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .WithMany(c => c.CartItems)
                    .HasForeignKey(ci => ci.CartId);
 
+            modelBuilder.Entity<Category>()
+                   .HasOne(c => c.ParentCategory)
+                   .WithMany(c => c.SubCategories)
+                   .HasForeignKey(c => c.ParentId)
+                   .OnDelete(DeleteBehavior.Restrict);   // new
 
 
             modelBuilder.Entity<Order>()
