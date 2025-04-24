@@ -1,6 +1,8 @@
 ﻿using KatsiashviliAnzorWebApplication.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection.Emit;
+using System.Text.Json;
 
 namespace KatsiashviliAnzorWebApplication.Data
 {
@@ -26,8 +28,26 @@ namespace KatsiashviliAnzorWebApplication.Data
     
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            // Define the ValueComparer for List<int>
+            var intListComparer = new ValueComparer<List<int>>(
+                (c1, c2) => c1.SequenceEqual(c2),  // Compare lists by element equality
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v)),  // Generate a hash code for the list
+                c => c.ToList()  // Clone the list to avoid reference issues
+                );
+
+                    modelBuilder.Entity<User>()
+        .Property(u => u.FavoriteProductIds)
+        .HasConversion(
+            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+            v => JsonSerializer.Deserialize<List<int>>(v, (JsonSerializerOptions)null) ?? new List<int>()
+        )
+        .Metadata.SetValueComparer(intListComparer);  // Apply the ValueComparer
+
+            base.OnModelCreating(modelBuilder); // Ensure the base method is also called
         
-            modelBuilder.Entity<Cart>()
+
+        modelBuilder.Entity<Cart>()
                    .HasOne(c => c.User) 
                    .WithOne() 
                    .HasForeignKey<Cart>(c => c.UserId) 
@@ -70,6 +90,7 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .WithOne(r => r.Product)  
                    .HasForeignKey(r => r.ProductId)
                    .OnDelete(DeleteBehavior.Cascade);
+
 
            
 

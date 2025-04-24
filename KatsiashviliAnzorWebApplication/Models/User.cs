@@ -12,6 +12,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         public string LastName { get; set; }
         public UserRole Role { get; set; }
         public ICollection<Order>? Orders { get; set; }
+        public List<int>? FavoriteProductIds { get; set; } = new();
         public DateTime CreatedAt { get; set; } 
     }
 }

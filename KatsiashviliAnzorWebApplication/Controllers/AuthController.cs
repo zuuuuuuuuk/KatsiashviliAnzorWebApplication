@@ -29,7 +29,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var user = _authService.Authenticate(model.Email, model.Password);
             if (user == null)
             {
-                return Unauthorized(new { message = "Email or password is incorrect"});
+                return Unauthorized(new { message = "Email or password is incorrect"} );
             }
 
             var token = _authService.GenerateJwtToken(user);
@@ -64,7 +64,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 PasswordHash = _authService.HashPassword(model.Password),
-                Role = Enum.UserRole.User,
+                Role = Enum.UserRole.Admin,
                 CreatedAt = DateTime.UtcNow,
             };
 
