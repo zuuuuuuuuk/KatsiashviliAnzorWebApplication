@@ -48,7 +48,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                         .ThenInclude(p => p.Images)  
                     .AsSplitQuery()  // This prevents potential performance issues gets rid of duplicating data 
                     .SelectMany(c => c.Products)
-                    .ToList();
+                    .ToList();  
             }
         }
 

@@ -132,8 +132,19 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 return BadRequest("images are null");
             }
-            if (existingProduct != null)
-                existingProduct.Images = product.Images;
+            if (product.Images == null || !product.Images.Any())
+            {
+                return BadRequest("images are null or empty");
+            }
+
+            // This clears EF's current tracked collection so it can save the new one
+            existingProduct.Images?.Clear();
+
+            existingProduct.Images = product.Images.Select(img => new Image
+            {
+                Url = img.Url,
+                Description = img.Description
+            }).ToList();
 
             _productService.UpdateProduct(existingProduct);
 
