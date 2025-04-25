@@ -64,7 +64,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 PasswordHash = _authService.HashPassword(model.Password),
-                Role = Enum.UserRole.Admin,
+                Role = Enum.UserRole.User,
                 CreatedAt = DateTime.UtcNow,
             };
 

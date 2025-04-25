@@ -132,7 +132,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         [HttpPost("{userId}/favorites/{productId}")]
-        public IActionResult AddFavoriteProduct(int userId, int productId)
+        public IActionResult ToggleFavoriteProduct(int userId, int productId)
         {
             var user = _userService.GetUserById(userId);
             if (user == null)
@@ -151,31 +151,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(user.FavoriteProductIds); // send back updated list
         }
 
-        [HttpDelete("{userId}/favorites/{productId}")]
-        public IActionResult RemoveFavoriteProduct(int userId, int productId)
-        {
-            var user = _userService.GetUserById(userId);
-            if (user == null)
-                return NotFound("User not found");
-
-            if (user.FavoriteProductIds.Contains(productId))
-            {
-                user.FavoriteProductIds.Remove(productId);
-                _userService.UpdateUser(user);
-            }
-
-            return Ok(user.FavoriteProductIds);
-        }
-
-        [HttpGet("{userId}/favorites")]
-        public IActionResult GetFavoriteProducts(int userId)
-        {
-            var user = _userService.GetUserById(userId);
-            if (user == null)
-                return NotFound("User not found");
-
-            return Ok(user.FavoriteProductIds);
-        }
+       
 
 
     }
