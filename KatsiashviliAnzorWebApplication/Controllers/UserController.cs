@@ -153,6 +153,16 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
        
 
+        [HttpGet("{userId}/favorites")]
+        public IActionResult GetFavoriteProducts(int userId)
+        {
+            var user = _userService.GetUserById(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            return Ok(user.FavoriteProductIds);
+        }
+
 
     }
 }
