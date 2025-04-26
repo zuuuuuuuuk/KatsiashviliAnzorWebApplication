@@ -128,24 +128,18 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if (product.CategoryId > 0)
                 existingProduct.CategoryId = product.CategoryId;
 
-            if (product.Images == null || !product.Images.Any())
+            if (product.Images != null && product.Images.Any())
+
             {
-                return BadRequest("images are null");
+                // This clears EF's current tracked collection so it can save the new one
+                existingProduct.Images?.Clear();
+
+                existingProduct.Images = product.Images.Select(img => new Image
+                {
+                    Url = img.Url,
+                    Description = img.Description
+                }).ToList();
             }
-            if (product.Images == null || !product.Images.Any())
-            {
-                return BadRequest("images are null or empty");
-            }
-
-            // This clears EF's current tracked collection so it can save the new one
-            existingProduct.Images?.Clear();
-
-            existingProduct.Images = product.Images.Select(img => new Image
-            {
-                Url = img.Url,
-                Description = img.Description
-            }).ToList();
-
             _productService.UpdateProduct(existingProduct);
 
             return Ok("product updated successfully");
