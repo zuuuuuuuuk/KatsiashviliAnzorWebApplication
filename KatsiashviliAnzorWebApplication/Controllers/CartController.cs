@@ -222,7 +222,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-
+        // remove product quantity 1 from cart by cartId
         [HttpDelete("remove-product-quantity/{id}")]
         public IActionResult RemoveProductQuantityFromCart(int id, int productId)
         {
@@ -235,7 +235,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var item = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
             if (item == null)
             {
-                return NotFound("Product not found in cart");
+                
+                return NotFound($"productId: {productId}Product not found in cart");
             }
 
             var product = _productService.GetProductById(productId);
@@ -259,7 +260,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
             
             _cartService.UpdateCart(cart);
-            return Ok("Product quantity updated successfully");
+            return Ok(new { message = "Product quantity updated successfully" });
         }
 
         public class RemoveProductRequest

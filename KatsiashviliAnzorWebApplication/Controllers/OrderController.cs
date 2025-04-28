@@ -137,7 +137,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _orderService.UpdateOrder(ord);
 
 
-            return Ok($"{user.LastName} has successfully created an order");
+            return Ok(new { message = $"{user.FirstName} has successfully created an order" });
         }
 
         [HttpPut("{id}/status")]
