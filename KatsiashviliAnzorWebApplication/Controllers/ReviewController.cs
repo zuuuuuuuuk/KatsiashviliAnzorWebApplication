@@ -32,9 +32,18 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var user = _userService.GetUserById(userId);
             var product = _productService.GetProductById(productId);
 
+
+
             if (product == null)
             {
                 return BadRequest("internal product nullRefference error");
+            }
+
+            var existingReview = _reviewService.GetAllReviews()
+                                     .FirstOrDefault(r => r.UserId == userId && r.ProductId == productId);
+            if (existingReview != null)
+            {
+                return BadRequest(new { message = "You have already submitted a review for this product." });
             }
             var rev = new Review()
             {
@@ -59,7 +68,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             _productService.UpdateProduct(product);
 
-            return Ok("Review added successfully");
+            return Ok(new { message = "Review added successfully" });
         }
 
 

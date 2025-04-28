@@ -45,6 +45,17 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(cart);
         }
 
+        [HttpGet("userId")] 
+        public IActionResult GetCartByUserId(int userId) 
+        {
+           var cart = _cartService.GetCartByUserId(userId);
+            if (cart == null)
+            {
+                return NotFound("user has no cart");
+            }
+            return Ok(cart);
+        }
+
         // Create new cart
 
         [HttpPost("create")]
@@ -207,15 +218,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
 
             _cartService.UpdateCart(cart);
-            return Ok("Products added successfully");
+            return Ok(new { message = "product added to the cart"});
         }
 
 
 
-        // Remove products from cart with productIds
-
-        [HttpPut("remove-products/{id}")]
-        public IActionResult DeleteProductsFromCart(int id, List<int> productIds)
+        [HttpDelete("remove-product-quantity/{id}")]
+        public IActionResult RemoveProductQuantityFromCart(int id, int productId)
         {
             var cart = _cartService.GetCartById(id);
             if (cart == null)
@@ -223,24 +232,72 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return NotFound("Cart not found");
             }
 
-            foreach (var productId in productIds)
+            var item = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+            if (item == null)
             {
+                return NotFound("Product not found in cart");
+            }
+
+            var product = _productService.GetProductById(productId);
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+
+            // Ensure we don't remove more than what's in the cart
+            int quantityToRemove = Math.Min(1, item.Quantity);
+
+            // Restore stock for the quantity being removed
+            product.Stock += quantityToRemove;
+            _productService.UpdateProduct(product);
+
+            // Reduce quantity or remove item entirely if quantity becomes zero
+            item.Quantity -= quantityToRemove;
+            if (item.Quantity <= 0)
+            {
+                cart.CartItems.Remove(item);
+            }
+            
+            _cartService.UpdateCart(cart);
+            return Ok("Product quantity updated successfully");
+        }
+
+        public class RemoveProductRequest
+        {
+            public int ProductId { get; set; }
+            public int Quantity { get; set; }
+        }
+
+
+
+        // Remove product from cart with productId
+
+        [HttpDelete("remove-product/{id}")]
+        public IActionResult DeleteProductFromCart(int id, int productId)
+        {
+            var cart = _cartService.GetCartById(id);
+            if (cart == null)
+            {
+                return NotFound("Cart not found");
+            }
+
+           
                 var item = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
                 if (item == null)
                 {
-                    continue; // Skip if item not found in cart
+                    BadRequest("cart product not found"); // Skip if item not found in cart
                 }
 
                 var product = _productService.GetProductById(productId);
                 if (product == null)
                 {
-                    continue; // Skip if product not found
+                    BadRequest("product not found"); // Skip if product not found
                 }
 
                 product.Stock += item.Quantity; // Restore stock
                 _productService.UpdateProduct(product);
                 cart.CartItems.Remove(item);
-            }
+            
 
             _cartService.UpdateCart(cart);
             return Ok("Products removed successfully");

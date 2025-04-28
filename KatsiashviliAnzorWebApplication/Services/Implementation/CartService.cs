@@ -37,7 +37,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
 
         public Cart GetCartByUserId(int userId)
         {
-            return _context.Carts.FirstOrDefault(c => c.UserId == userId);
+            return _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.UserId == userId);
         }
 
         public void RemoveExpiredCarts()
@@ -48,18 +48,21 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
 
             foreach (var cart in expiredCarts)
             {
-                // Restore stock for each item before deleting the cart
-                foreach (var item in cart.CartItems)
+                if (cart != null && cart.CartItems != null)
                 {
-                    var product = _context.Products.FirstOrDefault(p => p.Id == item.ProductId);
-                    if (product != null)
+                    // Restore stock for each item before deleting the cart
+                    foreach (var item in cart.CartItems)
                     {
-                        product.Stock += item.Quantity; // Restock products
-                        _context.Products.Update(product);
+                        var product = _context.Products.FirstOrDefault(p => p.Id == item.ProductId);
+                        if (product != null)
+                        {
+                            product.Stock += item.Quantity; // Restock products
+                            _context.Products.Update(product);
+                        }
                     }
-                }
 
-                _context.Carts.Remove(cart);
+                    _context.Carts.Remove(cart);
+                }
             }
 
             _context.SaveChanges();
