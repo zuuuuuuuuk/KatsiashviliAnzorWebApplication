@@ -23,7 +23,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-        [Authorize(Policy = "AdminOnly")]
+
         [HttpGet]
         public IActionResult GetAllProducts()
         {
