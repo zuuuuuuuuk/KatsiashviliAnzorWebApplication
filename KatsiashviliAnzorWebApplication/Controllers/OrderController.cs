@@ -42,9 +42,29 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         public IActionResult GetOrderById(int id)
         {
             var order = _orderService.GetOrderById(id);
+            if (order == null)
+            {
+                return Ok(new { message = "user has no orders" });
+            }
             return Ok(order);
         }
-        
+
+
+        [HttpGet("get-orders/{userId}")]
+        public IActionResult GetOrdersByUserId(int userId)
+        {
+            var orders = _orderService.GetOrdersByUserId(userId);
+            if (orders == null)
+            {
+                return Ok(new {message = "user has no orders"});
+            }
+            else
+            {
+                return Ok(orders);
+            }
+        }
+
+
         // Create new order
 
         [HttpPost]
