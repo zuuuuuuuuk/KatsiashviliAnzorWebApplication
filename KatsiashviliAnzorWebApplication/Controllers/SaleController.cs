@@ -2,6 +2,7 @@
 using KatsiashviliAnzorWebApplication.Dto;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +36,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         // Adding the Sale
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public IActionResult AddSale(SaleDto saleDto)
         {
@@ -115,7 +116,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         //Updating Sale
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
         public IActionResult UpdateSale(int id, SaleDto sale)
         {
@@ -190,7 +191,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         // Adding products to sale
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}/add-products")]
         public IActionResult AddProductsToSale(int id, List<int> productIds)
         {
@@ -231,7 +232,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         // Removing products from sale
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}/remove-products")]
         public IActionResult DeleteProduct(int id, List<int> productIds)
         {
@@ -269,7 +270,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         // Deleting the Sale with ID and applying changes to products
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public IActionResult DeleteSale(int id)
         {
@@ -327,7 +328,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         // Activating Specific Sale with ID
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("{id}/{days}/activate")]
         public IActionResult ActivateSaleById(int id, int days)
         {
@@ -344,7 +345,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         // Deactivating specific Sale with ID
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("{id}/deactivate")]
         public  IActionResult DeactivateSaleById(int id)
         {
@@ -360,7 +361,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         // Activating All the Sales
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("{days}/activate-all")]
         public IActionResult ActivateAllSales(int days)
         {
@@ -380,7 +381,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         // Deactivating All the Sales
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("deactivate-all")]
         public IActionResult DeactivateAllSales()
         {

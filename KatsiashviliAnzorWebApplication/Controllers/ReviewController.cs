@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Implementation;
 using KatsiashviliAnzorWebApplication.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KatsiashviliAnzorWebApplication.Controllers
 {
@@ -134,7 +135,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public IActionResult DeleteReview(int id)
         {
