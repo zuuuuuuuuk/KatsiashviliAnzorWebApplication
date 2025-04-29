@@ -3,6 +3,7 @@ using KatsiashviliAnzorWebApplication.Services.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Dto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KatsiashviliAnzorWebApplication.Controllers
 {
@@ -38,7 +39,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             var promoCode = _promoCodeService.getPromoCodeByCode(code);
             return Ok(promoCode);
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public IActionResult AddPromoCode(PromoCodeDto promoCodeDto) 
         {
@@ -56,7 +57,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _promoCodeService.AddPromoCode(pCode);
             return Ok("promoCode added Successfully");
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("id")]
         public IActionResult UpdatePromoCode(int id, PromoCodeDto promoCodeDto) 
         {
@@ -87,7 +88,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _promoCodeService.UpdatePromoCode(existingPromoCode);
             return Ok($"PromoCode with id {id} has been updated successfully"); 
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("id")]
         public ActionResult DeletePromoCodeById(int id) 
         {

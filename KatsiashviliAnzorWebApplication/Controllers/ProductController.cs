@@ -6,6 +6,7 @@ using KatsiashviliAnzorWebApplication.Services;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using KatsiashviliAnzorWebApplication.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KatsiashviliAnzorWebApplication.Controllers
 {
@@ -22,7 +23,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet]
         public IActionResult GetAllProducts()
         {
@@ -50,7 +51,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(prods);
         }
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public IActionResult AddProduct(ProductDto product)
         {
@@ -105,7 +106,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok("product was added successfully");
 
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
         public IActionResult UpdateProduct(int id, ProductDto product)
         {
@@ -144,7 +145,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             return Ok("product updated successfully");
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
         public IActionResult DeleteProduct(int id)
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Dto;
 using KatsiashviliAnzorWebApplication.Enum;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KatsiashviliAnzorWebApplication.Controllers
 {
@@ -19,7 +20,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _orderService = orderService;
         }
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet]
 
         public IActionResult GetUsers()
@@ -64,7 +65,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, UserDto user)
         {
@@ -117,6 +118,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
 
         public IActionResult DeleteUser(int id)

@@ -49,9 +49,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         public IActionResult GetCartByUserId(int userId) 
         {
            var cart = _cartService.GetCartByUserId(userId);
-            if (cart == null)
+           if (cart == null)
             {
-                return NotFound("user has no cart");
+                return Ok(new {message = "user has no cart yet"});
             }
             return Ok(cart);
         }
@@ -110,10 +110,11 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
 
 
-            return Ok("cart created successfully");
+            return Ok(new { message = "cart created successfully" });
         }
 
         // Update cart
+
 
         [HttpPut("{id}")]
         public IActionResult UpdateCart(int id, CartDto cartDto)

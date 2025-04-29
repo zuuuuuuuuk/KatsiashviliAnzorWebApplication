@@ -48,7 +48,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
 
 
-            return Ok("payment successful. Order status updated.");
+            return Ok(new { message = "payment successful. Order status updated." });
 
         }
 

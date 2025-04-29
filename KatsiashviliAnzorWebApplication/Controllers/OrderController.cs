@@ -71,7 +71,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 TotalAmount = 0
             };
 
-
+            
 
             _orderService.AddOrder(ord);
 
@@ -136,8 +136,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 ord.TotalAmount = totalAmount;
             _orderService.UpdateOrder(ord);
 
-
-            return Ok(new { message = $"{user.FirstName} has successfully created an order" });
+            
+            
+            return Ok(ord);
         }
 
         [HttpPut("{id}/status")]
