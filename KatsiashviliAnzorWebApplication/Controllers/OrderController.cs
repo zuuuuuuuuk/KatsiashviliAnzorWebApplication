@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Dto;
 using KatsiashviliAnzorWebApplication.Enum;
+using Microsoft.AspNetCore.Authorization;
+
 namespace KatsiashviliAnzorWebApplication.Controllers
 {
     [ApiController]
@@ -160,7 +162,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             
             return Ok(ord);
         }
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}/status")]
         public IActionResult UpdateOrder(int id, OrderStatus status)
         {
