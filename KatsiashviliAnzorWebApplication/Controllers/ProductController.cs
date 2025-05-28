@@ -117,9 +117,12 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 return BadRequest("product is null");
             }
+            if (string.IsNullOrWhiteSpace(product.Name) || product.Name == "string")
+            {
+                product.Name = existingProduct.Name;
+            }
+            existingProduct.Name = product.Name;
 
-            if (!string.IsNullOrWhiteSpace(product.Name) && product.Name != "string")
-                existingProduct.Name = product.Name;
             if (!string.IsNullOrWhiteSpace(product.Description) && product.Description != "string")
                 existingProduct.Description = product.Description;
             if (product.OriginalPrice > 0)
@@ -143,7 +146,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             }
             _productService.UpdateProduct(existingProduct);
 
-            return Ok("product updated successfully");
+            return Ok(new { message = "product updated successfully" });
         }
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id}")]
