@@ -135,7 +135,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if (product.Images != null && product.Images.Any())
 
             {
-                // This clears EF's current tracked collection so it can save the new one
+
                 existingProduct.Images?.Clear();
 
                 existingProduct.Images = product.Images.Select(img => new Image

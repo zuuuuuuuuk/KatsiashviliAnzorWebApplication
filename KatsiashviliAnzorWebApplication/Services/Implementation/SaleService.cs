@@ -42,7 +42,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
         {
             var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
 
-            if (sale == null && !sale.IsActive)
+            if (sale == null || sale.IsActive)
             {
                 throw new Exception("Sale not found or is already active");
             }
@@ -98,56 +98,67 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
         public void DeactivateSale(int saleId)
         {
             var sale = _context.Sales.Include(s => s.ProductsOnThisSale).FirstOrDefault(s => s.Id == saleId);
-
             if (sale == null)
             {
                 throw new Exception("Sale not found");
             }
-            var prods = new List<Product>();
-            
-            using (var transaction = _context.Database.BeginTransaction()) // ert operaciad rom moxdes da naxevrad ar sheicvalos baza
+
+            using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
+                    // Get all product IDs from this sale
+                    var productIds = sale.ProductsOnThisSale.Select(p => p.Id).ToList();
+
+                    // Get all other active sales that affect these products
+                    var otherActiveSalesWithProducts = _context.Sales
+                        .Where(s => s.IsActive && s.Id != saleId)
+                        .Include(s => s.ProductsOnThisSale)
+                        .Where(s => s.ProductsOnThisSale.Any(p => productIds.Contains(p.Id)))
+                        .ToList();
+
                     foreach (var product in sale.ProductsOnThisSale)
                     {
-                        // checking if there are other active sales for this product
-                        var otherActiveSales = _context.Sales
-                            .Where(s => s.IsActive && s.Id != saleId && s.ProductsOnThisSale.Contains(product))
+                        // Find other active sales for this specific product
+                        var otherActiveSalesForProduct = otherActiveSalesWithProducts
+                            .Where(s => s.ProductsOnThisSale.Any(p => p.Id == product.Id))
                             .ToList();
 
-                        if (!otherActiveSales.Any())
+                        if (!otherActiveSalesForProduct.Any())
                         {
-                            // if there are no other active sales, reset to originalPrice
+                            // No other active sales, reset to original price
                             product.DiscountedPrice = product.OriginalPrice;
                         }
                         else
                         {
-                            // applying remaining active sales
-                            decimal discountMultiplier = otherActiveSales
-                                .Aggregate(1m, (total, s) => total * (1 - (s.DiscountValue / 100)));
-
+                            // Calculate cumulative discount from remaining active sales
+                            decimal discountMultiplier = 1m;
+                            foreach (var activeSale in otherActiveSalesForProduct)
+                            {
+                                discountMultiplier *= (1 - (activeSale.DiscountValue / 100m));
+                            }
                             product.DiscountedPrice = product.OriginalPrice * discountMultiplier;
-                            
                         }
-                        prods.Add(product);
+
                         _context.Products.Update(product);
-                        
                     }
-                    sale.ProductsOnThisSale = prods;
+
+                    // Deactivate the sale
                     sale.IsActive = false;
-                    _context.Update(sale);
+                    sale.StartsAt = null;
+                    sale.EndsAt = null;
+
+                    _context.Sales.Update(sale);
+
                     _context.SaveChanges();
                     transaction.Commit();
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    throw new Exception("error during sale deactivation", ex);
+                    throw new Exception("Error during sale deactivation", ex);
                 }
-            } 
-
-           
+            }
         }
 
         // Getting All Sales

@@ -29,9 +29,9 @@ namespace KatsiashviliAnzorWebApplication.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            // Define the ValueComparer for List<int>
+            // Defines the ValueComparer for List<int> 
             var intListComparer = new ValueComparer<List<int>>(
-                (c1, c2) => c1.SequenceEqual(c2),  // Compare lists by element equality
+                (c1, c2) => c1.SequenceEqual(c2),  // Compare lists by element equality 
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v)),  // Generate a hash code for the list
                 c => c.ToList()  // Clone the list to avoid reference issues
                 );
@@ -42,9 +42,9 @@ namespace KatsiashviliAnzorWebApplication.Data
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
             v => JsonSerializer.Deserialize<List<int>>(v, (JsonSerializerOptions)null) ?? new List<int>()
         )
-        .Metadata.SetValueComparer(intListComparer);  // Apply the ValueComparer
+        .Metadata.SetValueComparer(intListComparer);  // Apply the ValueComparer intis listebistvis
 
-            base.OnModelCreating(modelBuilder); // Ensure the base method is also called
+            base.OnModelCreating(modelBuilder); 
         
 
         modelBuilder.Entity<Cart>()
