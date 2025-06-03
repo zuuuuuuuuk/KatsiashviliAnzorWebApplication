@@ -227,7 +227,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             
 
-            return Ok("products added successfully");
+            return Ok( new { message = "products added successfully" });
         }
 
 

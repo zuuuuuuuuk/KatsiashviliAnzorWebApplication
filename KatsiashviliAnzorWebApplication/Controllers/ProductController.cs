@@ -103,7 +103,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             };
 
             _productService.AddProduct(prod);
-            return Ok("product was added successfully");
+            return Ok( new { message = "product was added successfully" });
 
         }
         [Authorize(Policy = "AdminOnly")]
@@ -158,7 +158,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("can not find product with that id");
             }
             _productService.DeleteProduct(id);
-            return Ok($"product with id {id} has been deleted successfully");
+            return Ok(new { message = $"product with id {id} has been deleted successfully" });
         }
     }
 }
