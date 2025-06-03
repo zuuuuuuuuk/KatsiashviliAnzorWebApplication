@@ -161,7 +161,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("Sale start date must be before end date");
             }
 
-            existingSale.IsActive = sale.IsActive;
+            
 
             // Update products
             if (sale.ProductIdsOnThisSale != null)
@@ -186,7 +186,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 _saleService.ActivateSaleWithDefaultDates(existingSale.Id);
             }
 
-            return Ok($"Sale with id {id} has been updated successfully");
+            return Ok(new { message = $"Sale with id {id} has been updated successfully" });
         }
 
 
@@ -336,7 +336,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             try
             {
                 _saleService.ActivateSale(id, days);
-                return Ok($"sale with id {id} is active");
+                return Ok( new { message = $"sale with id {id} is active" });
             }
             catch (Exception ex)
             {
@@ -352,7 +352,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             try
             {
                 _saleService.DeactivateSale(id);
-                return Ok($"sale with id {id} has been deactivated");
+                return Ok( new { message = $"sale with id {id} has been deactivated" });
             }
             catch (Exception ex)
             {
