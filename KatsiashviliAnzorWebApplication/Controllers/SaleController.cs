@@ -262,9 +262,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 _saleService.UpdateProductDiscountedPrice(product);
             }
 
-           
 
-            return Ok("products removed successfully");
+
+            return Ok(new { message = "products removed successfully" });
         }
 
 
@@ -304,7 +304,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                     _context.Products.Update(product);  // marks property of product modified
                 }
             }
-            return Ok($"sale with id {id} has been deleted");
+            return Ok(new { message = "products removed successfully" });
         }
 
         // Getting Active Sales for Specific Product
