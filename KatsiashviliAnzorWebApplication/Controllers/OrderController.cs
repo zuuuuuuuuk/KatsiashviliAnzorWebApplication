@@ -35,6 +35,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 return BadRequest("there are no orders");
             }
+            ;
             return Ok(orders);
         }
 
@@ -192,7 +193,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("can not find order with that id");
             }
             _orderService.DeleteOrder(id);
-            return Ok($"Order with id {id} has been deleted successfully");
+            return Ok( new { message = $"Order with id {id} has been deleted successfully" });
         }
     }
 }
