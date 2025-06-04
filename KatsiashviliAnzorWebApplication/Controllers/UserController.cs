@@ -67,7 +67,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
         [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, UserDto user)
+        public IActionResult UpdateUser(int id, UpdateUserDto user)
         {
 
             User us = _userService.GetUserById(id);
@@ -82,16 +82,20 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if (!string.IsNullOrWhiteSpace(user.LastName) && user.LastName != "string")
                 us.LastName = user.LastName;
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && user.Email != "string")
-                us.Email = user.Email;
-
-
-            if (!string.IsNullOrWhiteSpace(user.PasswordHash) && user.PasswordHash != "string")
-                us.PasswordHash = user.PasswordHash;
-
+            if (user.Role != null)
+            {
+                if (user.Role == 0)
+                {
+                    us.Role = UserRole.User;
+                }
+                else if (user.Role == 2)
+                {
+                    us.Role = UserRole.Admin;
+                }
+            }
             _userService.UpdateUser(us);
 
-            return Ok("user updated");
+            return Ok( new { message = "user updated" });
         }
 
         [HttpGet("{id}/orders")]
