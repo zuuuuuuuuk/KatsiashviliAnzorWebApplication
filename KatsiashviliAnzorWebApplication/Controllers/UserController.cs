@@ -129,7 +129,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("can not find user with that id");
             }
             _userService.DeleteUser(id);
-            return Ok("User has been deleted");
+            return Ok( new { message = "User has been deleted" });
         }
 
 
