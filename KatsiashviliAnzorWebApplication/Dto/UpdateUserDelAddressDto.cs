@@ -3,6 +3,6 @@
     public class UpdateUserDelAddressDto
     {
         public string Address { get; set; }
-        public bool isDefault { get; set; }
+        public bool? isDefault { get; set; }
     }
 }
