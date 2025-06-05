@@ -65,7 +65,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-        [Authorize(Policy = "AdminOnly")]
+        
         [HttpPut("{id}")]
         public IActionResult UpdateUser(int id, UpdateUserDto user)
         {
