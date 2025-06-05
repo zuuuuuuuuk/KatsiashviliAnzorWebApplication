@@ -9,6 +9,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         [JsonIgnore]
         public User User { get; set; }
         public string Address { get; set; } = null!;
+        public bool isDefault { get; set; } = false;
         
     }
 }
