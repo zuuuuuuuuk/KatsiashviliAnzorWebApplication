@@ -4,6 +4,7 @@ using KatsiashviliAnzorWebApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KatsiashviliAnzorWebApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250605205745_AddDeliveryAddressEntity")]
+    partial class AddDeliveryAddressEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,7 +147,7 @@ namespace KatsiashviliAnzorWebApplication.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DeliveryAddresses");
+                    b.ToTable("DeliveryAddress");
                 });
 
             modelBuilder.Entity("KatsiashviliAnzorWebApplication.Models.Image", b =>

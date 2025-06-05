@@ -170,5 +170,72 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
+        // DeliveryEndpoints
+
+
+
+        // GET api/user/{userId}/deliveryAddresses
+        [HttpGet("{userId}/deliveryAddresses")]
+        public IActionResult GetDeliveryAddresses(int userId)
+        {
+            try
+            {
+                var addresses = _userService.GetDeliveryAddressesByUserId(userId);
+                return Ok(addresses);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // POST api/user/{userId}/deliveryAddresses
+        [HttpPost("{userId}/deliveryAddresses")]
+        public IActionResult AddDeliveryAddress(int userId, [FromBody] UpdateUserDelAddressDto dto)
+        {
+            
+            try 
+            {
+                _userService.AddDeliveryAddress(userId, dto.Address);
+                return Ok(new { message = "Address added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // PUT api/user/{userId}/deliveryAddresses/{addressId}
+        [HttpPut("{userId}/deliveryAddresses/{addressId}")]
+        public IActionResult UpdateDeliveryAddress(int userId, int addressId, [FromBody] UpdateUserDelAddressDto dto)
+        {
+            try
+            {
+                _userService.UpdateDeliveryAddress(userId, addressId, dto.Address);
+                return Ok(new { message = "Address updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // DELETE api/user/{userId}/deliveryAddresses/{addressId}
+        [HttpDelete("{userId}/deliveryAddresses/{addressId}")]
+        public IActionResult DeleteDeliveryAddress(int userId, int addressId)
+        {
+            try    
+            {
+                _userService.DeleteDeliveryAddress(userId, addressId);
+                return Ok(new { message = "Address deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

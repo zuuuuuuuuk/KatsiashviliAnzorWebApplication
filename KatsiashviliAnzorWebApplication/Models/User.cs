@@ -13,6 +13,7 @@ namespace KatsiashviliAnzorWebApplication.Models
         public UserRole Role { get; set; }
         public ICollection<Order>? Orders { get; set; }
         public List<int>? FavoriteProductIds { get; set; } = new();
+        public ICollection<DeliveryAddress> DeliveryAddresses { get; set; } = new List<DeliveryAddress>();
         public DateTime CreatedAt { get; set; } 
     }
 }

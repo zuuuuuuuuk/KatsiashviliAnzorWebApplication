@@ -19,6 +19,7 @@ namespace KatsiashviliAnzorWebApplication.Data
         public DbSet<PromoCode> PromoCodes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Advertisement> Advertisements { get; set; }
+        public DbSet<DeliveryAddress> DeliveryAddresses { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -63,6 +64,14 @@ namespace KatsiashviliAnzorWebApplication.Data
                    .WithMany(c => c.SubCategories)
                    .HasForeignKey(c => c.ParentId)
                    .OnDelete(DeleteBehavior.Restrict);   // new
+
+            modelBuilder.Entity<DeliveryAddress>()
+       .HasOne(d => d.User)
+       .WithMany(u => u.DeliveryAddresses)
+       .HasForeignKey(d => d.UserId)
+       .OnDelete(DeleteBehavior.Cascade);  // deletes DeliveryAddresses when User is deleted
+
+            base.OnModelCreating(modelBuilder);
 
 
             modelBuilder.Entity<Order>()

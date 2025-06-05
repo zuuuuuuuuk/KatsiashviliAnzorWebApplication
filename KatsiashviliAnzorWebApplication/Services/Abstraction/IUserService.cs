@@ -9,5 +9,15 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
         void AddUser(User user);
         void UpdateUser(User user);
         void DeleteUser(int id);
+
+        List<DeliveryAddress>GetDeliveryAddressesByUserId(int userId);
+
+        void AddDeliveryAddress(int userId, string address);
+
+       void UpdateDeliveryAddress(int userId, int addressId, string newAddress);
+
+        void DeleteDeliveryAddress(int userId, int addressId);
+
+
     }
 }
