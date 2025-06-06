@@ -14,7 +14,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
 
         void AddDeliveryAddress(int userId, string address);
 
-       void UpdateDeliveryAddress(int userId, int addressId, string newAddress);
+       void UpdateDeliveryAddress(int userId, int addressId, string newAddress, bool isDefault);
 
         void DeleteDeliveryAddress(int userId, int addressId);
 

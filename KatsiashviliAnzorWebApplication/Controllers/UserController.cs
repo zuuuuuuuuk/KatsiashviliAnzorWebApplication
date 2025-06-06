@@ -206,12 +206,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
         // PUT api/user/{userId}/deliveryAddresses/{addressId}
+
         [HttpPut("{userId}/deliveryAddresses/{addressId}")]
         public IActionResult UpdateDeliveryAddress(int userId, int addressId, [FromBody] UpdateUserDelAddressDto dto)
         {
             try
             {
-                _userService.UpdateDeliveryAddress(userId, addressId, dto.Address);
+                _userService.UpdateDeliveryAddress(userId, addressId, dto.Address, dto.isDefault);
                 return Ok(new { message = "Address updated successfully." });
             }
             catch (Exception ex)

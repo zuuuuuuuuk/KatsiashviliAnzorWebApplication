@@ -69,15 +69,30 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             _context.SaveChanges();
         }
 
-        public void UpdateDeliveryAddress(int userId, int addressId, string newAddress)
+        public void UpdateDeliveryAddress(int userId, int addressId, string newAddress, bool isDefault)
         {
             var deliveryAddress = _context.DeliveryAddresses
-          .FirstOrDefault(d => d.Id == addressId && d.UserId == userId);
+                .FirstOrDefault(d => d.Id == addressId && d.UserId == userId);
 
             if (deliveryAddress == null)
                 throw new Exception("Delivery address not found");
 
+            // If setting this one as default, unset all others
+            if (isDefault)
+            {
+                var allAddresses = _context.DeliveryAddresses
+                    .Where(d => d.UserId == userId && d.Id != addressId)
+                    .ToList();
+
+                foreach (var addr in allAddresses)
+                {
+                    addr.isDefault = false;
+                }
+            }
+
             deliveryAddress.Address = newAddress;
+            deliveryAddress.isDefault = isDefault;
+
             _context.SaveChanges();
         }
 
