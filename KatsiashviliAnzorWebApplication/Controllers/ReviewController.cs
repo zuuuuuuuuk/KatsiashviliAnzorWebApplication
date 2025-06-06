@@ -145,7 +145,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 return BadRequest("can not find review with that id");
             }
             _reviewService.DeleteReview(id);
-            return Ok($"Review with id {id} has been deleted successfully");
+            return Ok(new { message = $"Review with id {id} has been deleted successfully" });
         }
 
 
