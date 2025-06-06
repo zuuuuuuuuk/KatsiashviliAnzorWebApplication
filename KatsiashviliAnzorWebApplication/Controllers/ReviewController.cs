@@ -135,7 +135,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         }
 
 
-        [Authorize(Policy = "AdminOnly")]
+
         [HttpDelete("{id}")]
         public IActionResult DeleteReview(int id)
         {
