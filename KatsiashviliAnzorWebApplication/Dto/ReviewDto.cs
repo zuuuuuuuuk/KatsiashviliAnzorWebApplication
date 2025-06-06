@@ -1,11 +1,14 @@
-﻿using KatsiashviliAnzorWebApplication.Models;
-
-namespace KatsiashviliAnzorWebApplication.Dto
+﻿namespace KatsiashviliAnzorWebApplication.Dto
 {
     public class ReviewDto
     {
-        
-        public double Rating { get; set; } 
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public int UserId { get; set; }
+        public double Rating { get; set; }
         public string? ReviewText { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public ReviewUserDto User { get; set; }
     }
 }

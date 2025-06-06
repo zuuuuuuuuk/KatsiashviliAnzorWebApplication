@@ -1,6 +1,8 @@
 ﻿using KatsiashviliAnzorWebApplication.Data;
+using KatsiashviliAnzorWebApplication.Dto;
 using KatsiashviliAnzorWebApplication.Models;
 using KatsiashviliAnzorWebApplication.Services.Abstraction;
+using Microsoft.EntityFrameworkCore;
 
 namespace KatsiashviliAnzorWebApplication.Services.Implementation
 {
@@ -36,9 +38,29 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
            return _context.Reviews.FirstOrDefault(r => r.Id == id);
         }
 
-        public List<Review> GetReviewsByProductId(int productId)
+
+        public List<ReviewDto> GetReviewsByProductId(int productId)
         {
-            return _context.Reviews.Where(r => r.ProductId == productId).ToList();
+            return _context.Reviews
+                .Include(r => r.User) // 👈 Force loading of the User object
+                .Where(r => r.ProductId == productId)
+                .Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    ProductId = r.ProductId,
+                    UserId = r.UserId,
+                    Rating = r.Rating,
+                    ReviewText = r.ReviewText,
+                    CreatedAt = r.CreatedAt,
+                    User = new ReviewUserDto
+                    {
+                        Id = r.User.Id,
+                        FirstName = r.User.FirstName,
+                        LastName = r.User.LastName,
+                        Role = r.User.Role
+                    }
+                })
+                .ToList();
         }
 
         public List<Review> GetReviewsByUserId(int userId)
