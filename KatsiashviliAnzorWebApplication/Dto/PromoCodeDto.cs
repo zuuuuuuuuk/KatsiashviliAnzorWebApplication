@@ -6,5 +6,6 @@
         public string Description { get; set; }
         public string Code { get; set; }
         public decimal DiscountValue { get; set; }
+        public bool IsGlobal { get; set; }
     }
 }

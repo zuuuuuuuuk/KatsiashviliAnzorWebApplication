@@ -52,7 +52,8 @@ namespace KatsiashviliAnzorWebApplication.Controllers
               Name = promoCodeDto.Name,
               Code = promoCodeDto.Code,
               Description = promoCodeDto.Description,
-              DiscountValue = promoCodeDto.DiscountValue
+              DiscountValue = promoCodeDto.DiscountValue,
+              IsGlobal = promoCodeDto.IsGlobal,
             };
             _promoCodeService.AddPromoCode(pCode);
             return Ok("promoCode added Successfully");
@@ -84,6 +85,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             {
                 existingPromoCode.DiscountValue = promoCodeDto.DiscountValue;
             }
+            existingPromoCode.IsGlobal = promoCodeDto.IsGlobal;
 
             _promoCodeService.UpdatePromoCode(existingPromoCode);
             return Ok($"PromoCode with id {id} has been updated successfully"); 
@@ -95,5 +97,50 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _promoCodeService.DeletePromoCode(id);
             return Ok($"promoCode with id {id} has been deleted");
         }
+
+
+        [HttpPost("buy/{promoId}")]
+        public ActionResult BuyPromoCodeVoucher(int promoId) 
+        {
+            var userIdClaim = User.FindFirst("id")?.Value;
+            if (!int.TryParse(userIdClaim, out var userId)) 
+                return Unauthorized();
+
+            var promo = _promoCodeService.GetPromoCodeById(promoId);
+
+            if (promo == null)
+                return NotFound("promo not found");
+
+            if (!promo.IsGlobal)
+                return BadRequest("Promo code is not buyable by users (its global)");
+
+            if (promo.OwnerUserId != null) 
+                return BadRequest("Promo code is already bought by someone");
+
+            promo.IsGlobal = false;
+            promo.OwnerUserId = userId;
+
+            _promoCodeService.UpdatePromoCode(promo);
+
+            return Ok(new 
+            { message = "promo code successfully bought",
+                Code = promo.Code, 
+                Name = promo.Name,
+                Description = promo.Description,
+                Value = promo.DiscountValue
+            }); 
+        }
+
+        [Authorize]
+        [HttpGet("GlobalPromoCodes")]
+        public IActionResult GetGlobalPromoCodes()
+        {
+            var globalPromos = _context.PromoCodes
+                .Where(p => p.IsGlobal == true)
+                .ToList();
+
+            return Ok(globalPromos);
+        }
+
     }
 }

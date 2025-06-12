@@ -147,7 +147,15 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                     return BadRequest("existing promocode was not found");
                 }
                 // updates final discountValue for order depending on it's previous sale discounts
-               
+        
+        if (!promoCode.IsGlobal)
+                {
+                    if (promoCode.OwnerUserId != user.Id)
+                        return BadRequest("promo code is not yours");
+                }
+                if (promoCode.IsUsed)
+                    return BadRequest("promo code is already used");
+
                 decimal discountAmount = (promoCode.DiscountValue / 100) * totalAmount; 
                                                                                       
                 totalAmount -= discountAmount;
