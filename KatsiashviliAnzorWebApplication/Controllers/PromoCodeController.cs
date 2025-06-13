@@ -98,7 +98,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok($"promoCode with id {id} has been deleted");
         }
 
-
+        [Authorize]
         [HttpPost("buy/{promoId}")]
         public ActionResult BuyPromoCodeVoucher(int promoId) 
         {
