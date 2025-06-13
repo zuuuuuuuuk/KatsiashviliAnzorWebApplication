@@ -111,7 +111,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             if (promo == null)
                 return NotFound("promo not found");
 
-            if (!promo.IsGlobal)
+            if (promo.IsGlobal)
                 return BadRequest("Promo code is not buyable by users (its global)");
 
             if (promo.OwnerUserId != null) 
