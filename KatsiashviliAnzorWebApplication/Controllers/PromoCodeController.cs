@@ -98,23 +98,18 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok($"promoCode with id {id} has been deleted");
         }
 
-        [Authorize]
-        [HttpPost("buy/{promoId}")]
-        public ActionResult BuyPromoCodeVoucher(int promoId) 
+        [HttpPost("buy/{promoId}/{userId}")]
+        public ActionResult BuyPromoCodeVoucher(int promoId, int userId)
         {
-            var userIdClaim = User.FindFirst("id")?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) 
-                return Unauthorized();
-
             var promo = _promoCodeService.GetPromoCodeById(promoId);
 
             if (promo == null)
-                return NotFound("promo not found");
+                return NotFound("Promo code not found");
 
             if (promo.IsGlobal)
-                return BadRequest("Promo code is not buyable by users (its global)");
+                return BadRequest("Promo code is not buyable by users (it's global)");
 
-            if (promo.OwnerUserId != null) 
+            if (promo.OwnerUserId != null)
                 return BadRequest("Promo code is already bought by someone");
 
             promo.IsGlobal = false;
@@ -122,13 +117,14 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
             _promoCodeService.UpdatePromoCode(promo);
 
-            return Ok(new 
-            { message = "promo code successfully bought",
-                Code = promo.Code, 
+            return Ok(new
+            {
+                message = "Promo code successfully bought",
+                Code = promo.Code,
                 Name = promo.Name,
                 Description = promo.Description,
                 Value = promo.DiscountValue
-            }); 
+            });
         }
 
         [Authorize]
