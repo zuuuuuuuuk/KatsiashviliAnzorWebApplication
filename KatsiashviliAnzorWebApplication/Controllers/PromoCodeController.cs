@@ -95,7 +95,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
         public ActionResult DeletePromoCodeById(int id) 
         {
             _promoCodeService.DeletePromoCode(id);
-            return Ok($"promoCode with id {id} has been deleted");
+            return Ok( new { message = $"promoCode with id {id} has been deleted" });
         }
 
         [HttpPost("buy/{promoId}/{userId}")]
