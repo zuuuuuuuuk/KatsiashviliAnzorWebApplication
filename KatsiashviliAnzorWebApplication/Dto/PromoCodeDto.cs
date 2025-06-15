@@ -7,5 +7,6 @@
         public string Code { get; set; }
         public decimal DiscountValue { get; set; }
         public bool IsGlobal { get; set; }
+        public int? SourcePromoId { get; set; }
     }
 }

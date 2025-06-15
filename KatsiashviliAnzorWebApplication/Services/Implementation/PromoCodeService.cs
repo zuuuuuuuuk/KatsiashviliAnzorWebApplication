@@ -45,5 +45,42 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             _context.PromoCodes.Update(promoCode);
             _context.SaveChanges();
         }
+
+
+
+        public PromoCode BuyPromoCode(int promoId, int userId)
+        {
+            var templatePromo = _context.PromoCodes.FirstOrDefault(p => p.Id == promoId);
+            if (templatePromo == null)
+                return null;
+
+            if (!templatePromo.IsGlobal)
+                throw new InvalidOperationException("Promo code is not buyable (it's global).");
+
+            var userPromo = new PromoCode
+            {
+                Name = templatePromo.Name,
+                Description = templatePromo.Description,
+                DiscountValue = templatePromo.DiscountValue,
+                Code = GenerateRandomCode(8),
+                IsGlobal = false,
+                OwnerUserId = userId,
+                SourcePromoId = promoId,
+            };
+
+            _context.PromoCodes.Add(userPromo);
+            _context.SaveChanges();
+
+            return userPromo;
+        }
+
+        private string GenerateRandomCode(int length)
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
     }
 }

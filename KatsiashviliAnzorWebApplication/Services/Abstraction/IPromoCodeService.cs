@@ -11,5 +11,7 @@ namespace KatsiashviliAnzorWebApplication.Services.Abstraction
         PromoCode getPromoCodeByCode(string code);
         void UpdatePromoCode(PromoCode promoCode);
         void DeletePromoCode(int id);
+
+        PromoCode BuyPromoCode(int promoId, int userId);
     }
 }

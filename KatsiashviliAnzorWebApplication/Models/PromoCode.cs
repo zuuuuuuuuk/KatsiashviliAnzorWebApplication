@@ -10,5 +10,7 @@
         public int? OwnerUserId { get; set; }
         public bool IsUsed { get; set; } = false;
         public bool IsGlobal { get; set; } = true;
+
+        public int? SourcePromoId { get; set; }
     }
 }

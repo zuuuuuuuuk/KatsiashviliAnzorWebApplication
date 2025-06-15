@@ -90,6 +90,34 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             _promoCodeService.UpdatePromoCode(existingPromoCode);
             return Ok($"PromoCode with id {id} has been updated successfully"); 
         }
+
+
+        [HttpPost("buy/{promoId}/{userId}")]
+        public ActionResult BuyPromoCode(int promoId, int userId)
+        {
+            try
+            {
+                var userPromo = _promoCodeService.BuyPromoCode(promoId, userId);
+
+                if (userPromo == null)
+                    return NotFound("Promo code template not found.");
+
+                return Ok(new
+                {
+                    message = "Promo code successfully bought",
+                    Code = userPromo.Code,
+                    Name = userPromo.Name,
+                    Description = userPromo.Description,
+                    Value = userPromo.DiscountValue
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [Authorize(Policy = "AdminOnly")]
         [HttpDelete("id")]
         public ActionResult DeletePromoCodeById(int id) 
@@ -98,34 +126,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok( new { message = $"promoCode with id {id} has been deleted" });
         }
 
-        [HttpPost("buy/{promoId}/{userId}")]
-        public ActionResult BuyPromoCodeVoucher(int promoId, int userId)
-        {
-            var promo = _promoCodeService.GetPromoCodeById(promoId);
-
-            if (promo == null)
-                return NotFound("Promo code not found");
-
-            if (promo.IsGlobal)
-                return BadRequest("Promo code is not buyable by users (it's global)");
-
-            if (promo.OwnerUserId != null)
-                return BadRequest("Promo code is already bought by someone");
-
-            promo.IsGlobal = false;
-            promo.OwnerUserId = userId;
-
-            _promoCodeService.UpdatePromoCode(promo);
-
-            return Ok(new
-            {
-                message = "Promo code successfully bought",
-                Code = promo.Code,
-                Name = promo.Name,
-                Description = promo.Description,
-                Value = promo.DiscountValue
-            });
-        }
+     
 
         [Authorize]
         [HttpGet("GlobalPromoCodes")]
