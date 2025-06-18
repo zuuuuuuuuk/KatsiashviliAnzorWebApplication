@@ -54,8 +54,9 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
             if (templatePromo == null)
                 return null;
 
-            if (!templatePromo.IsGlobal)
+            if (templatePromo.IsGlobal)
                 throw new InvalidOperationException("Promo code is not buyable (it's global).");
+
 
             var userPromo = new PromoCode
             {

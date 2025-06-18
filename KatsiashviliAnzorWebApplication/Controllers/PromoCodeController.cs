@@ -56,7 +56,7 @@ namespace KatsiashviliAnzorWebApplication.Controllers
               IsGlobal = promoCodeDto.IsGlobal,
             };
             _promoCodeService.AddPromoCode(pCode);
-            return Ok("promoCode added Successfully");
+            return Ok(new { message = "promoCode added Successfully" });
         }
         [Authorize(Policy = "AdminOnly")]
         [HttpPut("id")]
@@ -93,14 +93,41 @@ namespace KatsiashviliAnzorWebApplication.Controllers
 
 
         [HttpPost("buy/{promoId}/{userId}")]
-        public ActionResult BuyPromoCode(int promoId, int userId)
+        public  IActionResult BuyPromoCode(int promoId, int userId)
         {
+
+            
+           
+            var promoToBuy = _promoCodeService.GetPromoCodeById(promoId);
+           
+            if (promoToBuy == null) 
+            {  
+                return BadRequest(new {message = "promo is null"});
+            }
+
+            if (promoToBuy.IsGlobal) { 
+            return BadRequest(new {message = "cant buy global vouchers"});    
+            }
+
+            if(promoToBuy.SourcePromoId != null)
+            {
+                return BadRequest(new { message = "promo is replica" });
+            }
+            
+            var alreadyBought = _context.PromoCodes
+                .Any(p => p.OwnerUserId == userId && p.SourcePromoId == promoId);
+            if (alreadyBought)
+            {
+                return BadRequest(new { message = "You have already bought this voucher." });
+            }
+
+
             try
             {
                 var userPromo = _promoCodeService.BuyPromoCode(promoId, userId);
 
                 if (userPromo == null)
-                    return NotFound("Promo code template not found.");
+                    return NotFound(new { message = "Promo code template not found." });
 
                 return Ok(new
                 {
