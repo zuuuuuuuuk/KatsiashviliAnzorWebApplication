@@ -166,5 +166,13 @@ namespace KatsiashviliAnzorWebApplication.Controllers
             return Ok(globalPromos);
         }
 
+
+        [HttpGet("PromosByUserId/{userId}")]
+        public IActionResult GetPromosByUserId(int userId)
+        {
+            var promos = _promoCodeService.GetPromosByUserId(userId);
+            return Ok(promos);
+        }
+
     }
 }

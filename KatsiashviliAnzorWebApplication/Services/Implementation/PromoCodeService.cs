@@ -83,5 +83,11 @@ namespace KatsiashviliAnzorWebApplication.Services.Implementation
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+        public List<PromoCode> GetPromosByUserId(int userId)
+        {
+            return _context.PromoCodes
+                .Where(p => p.OwnerUserId == userId)
+                .ToList();
+        }
     }
 }
