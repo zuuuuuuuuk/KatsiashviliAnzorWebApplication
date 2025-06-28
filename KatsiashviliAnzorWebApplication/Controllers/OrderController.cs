@@ -139,9 +139,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 ord.OrderItems.Add(orderItem);
             }
 
-            if (!string.IsNullOrWhiteSpace(order.PromoCode) && order.PromoCode != "string")
+            if (!string.IsNullOrWhiteSpace(order.PromoCode))
             {
-                var promoCode = _promoCodeService.getPromoCodeByCode(order.PromoCode);
+                var promoCode = _promoCodeService.getPromoCodeByCode(order.PromoCode.ToLower());
         if (promoCode == null)
                 {
                     return BadRequest("existing promocode was not found");
@@ -156,8 +156,9 @@ namespace KatsiashviliAnzorWebApplication.Controllers
                 if (promoCode.IsUsed)
                     return BadRequest("promo code is already used");
 
-                decimal discountAmount = (promoCode.DiscountValue / 100) * totalAmount; 
-                                                                                      
+                decimal discountAmount = (promoCode.DiscountValue / 100) * totalAmount;
+                promoCode.IsUsed = true;
+                _promoCodeService.UpdatePromoCode(promoCode);
                 totalAmount -= discountAmount;
             } else
             {
